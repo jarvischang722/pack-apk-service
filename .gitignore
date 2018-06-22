@@ -1,0 +1,25 @@
+# Logs
+logs
+*.log
+
+# local note
+*.local.note
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.lock
+
+build
+node_modules
+ncp-debug.log
+npm-debug.log
+
+src/config/*.json
+
+/upload/
+/deploy/
+/icon/
+
+package-lock.json

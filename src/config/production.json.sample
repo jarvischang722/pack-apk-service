@@ -1,0 +1,17 @@
+{
+  "name": "Tripleonetech APK service",
+  "server": {
+    "port": 7100
+  },
+  "jwtOptions": {
+    "expiresIn": "180d"
+  },
+  "secret": {
+    "jwt": "jwtsecret",
+    "token": "abcd1234",
+    "cookie": "xyz987"
+  },
+  "timeout": {
+    "token": 7200
+  }
+}

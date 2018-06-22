@@ -1,0 +1,52 @@
+{
+  "private": true,
+  "engines": {
+    "node": ">=8",
+    "npm": ">3.5"
+  },
+  "name": "pack-service",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "",
+    "start": "node ./src/index.js"
+  },
+  "description": "Tripleonetech package service ",
+  "repository": "https://git.smartbackend.com/browser/pack-service.git",
+  "author": "jun.js.tw@tripleonetech.net",
+  "license": "ISC",
+  "dependencies": {
+    "babel-eslint": "^8.2.2",
+    "body-parser": "^1.17.1",
+    "cookie-parser": "^1.4.3",
+    "cors": "^2.8.4",
+    "date-utils": "^1.2.21",
+    "electron-builder": "^19.49.2",
+    "express": "^4.15.2",
+    "helmet": "^3.6.0",
+    "joi": "^10.5.2",
+    "jsonwebtoken": "^7.4.1",
+    "log4js": "^1.1.1",
+    "micromatch": "^3.1.10",
+    "multer": "^1.3.0",
+    "mv": "^2.1.1",
+    "ncp": "^2.0.0",
+    "request": "^2.81.0",
+    "restify-errors": "^6.1.1",
+    "supertest": "^3.0.0",
+    "uuid": "^3.0.1"
+  },
+  "devDependencies": {
+    "chai": "^4.0.1",
+    "chai-as-promised": "^6.0.0",
+    "cross-env": "^5.0.0",
+    "eslint": "^3.19.0",
+    "eslint-config-airbnb": "^15.0.1",
+    "eslint-config-airbnb-base": "^13.0.0",
+    "eslint-plugin-import": "^2.3.0",
+    "eslint-plugin-jsx-a11y": "^5.0.3",
+    "eslint-plugin-react": "^7.0.1",
+    "mocha": "^3.4.2",
+    "should": "^11.2.1"
+  }
+}
