@@ -8,8 +8,11 @@ const route = require('./route')
 const errors = require('./error')
 const authorization = require('./authorization')
 const cors = require('cors')
+const path = require('path')
 
 const log = log4js.getLogger()
+
+global.appRoot = path.resolve()
 const server = async () => {
   const app = express()
 
@@ -25,7 +28,10 @@ const server = async () => {
 
   app.use('/download', express.static('deploy'))
   app.use('/upload', express.static('upload'))
-
+  // TODO  Test page ,  Can be deleted when done.
+  app.set('views', path.join(__dirname, 'views'))
+  app.engine('html', require('ejs').renderFile)
+  app.set('view engine', 'html')
   const apiRouter = new express.Router()
   apiRouter.use(cookieParser(config.secret.cookie))
 
@@ -56,7 +62,7 @@ const server = async () => {
       error.message = err.message
       statusCode = err.statusCode || statusCode
     }
-    res.status(statusCode).send({ error })
+   // res.status(statusCode).send({ error })
   })
 
   app.use('/', apiRouter)

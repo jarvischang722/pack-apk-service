@@ -2,6 +2,7 @@ const multer = require('multer')
 const errors = require('../error')
 const { validate, getSchema, T } = require('../validator')
 const { generateToken } = require('../authorization')
+const APK = require('../schema/apk')
 
 const SCHEMA = {
   id: T.number().integer(),
@@ -34,7 +35,7 @@ errors.register(ERRORS)
 module.exports = (route, config, exempt) => {
   const build = async (req, res, next) => {
     try {
-      return res.send('hello~~~')
+      return res.json(await APK.build(req))
     } catch (err) {
       return next(err)
     }
@@ -42,5 +43,12 @@ module.exports = (route, config, exempt) => {
 
   exempt('/apk/build')
 
-  route.get('/apk/build', build)
+  const storage = multer.diskStorage({
+    destination: 'upload/logo',
+    filename: (req, file, cb) => {
+      cb(null, `${req.body.apk_name_en}.png`)
+    }
+  })
+
+  route.post('/apk/build', multer({ storage }).single('logo'), build)
 }

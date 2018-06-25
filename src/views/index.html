@@ -1,0 +1,73 @@
+<html>
+
+<head>
+  <title>Build APK Service</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap-theme.min.css">
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+  <div class="container">
+    <div id="signupbox" style=" margin-top:50px" class="mainbox col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
+      <div class="panel panel-info">
+        <div class="panel-heading">
+          <div class="panel-title">Build APK Service</div>
+        </div>
+        <div class="panel-body">
+          <form id="signupform" action="/apk/build" method="post" class="form-horizontal" role="form" enctype="multipart/form-data">
+            <div class="form-group">
+              <label for="apk_name" class="col-md-3 control-label">apk name</label>
+              <div class="col-md-9">
+                <input type="text" class="form-control" id="apk_name" name="apk_name">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="apk_name_en" class="col-md-3 control-label">apk english name</label>
+              <div class="col-md-9">
+                <input type="text" class="form-control" id="apk_name_en" name="apk_name_en">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="logo" class="col-md-3 control-label">logo url</label>
+              <div class="col-md-9">
+                <input type="file" class="form-control" id="logo" name="logo">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="apk_url" class="col-md-3 control-label">url</label>
+              <div class="col-md-9">
+                <input type="text" class="form-control" id="apk_url" name="apk_url">
+              </div>
+            </div>
+
+
+            <div style="border-top: 1px solid #999; padding-top:20px" class="form-group">
+
+              <div class="col-md-offset-3 col-md-9">
+                  <input type="submit" value="build apk" class="btn btn-primary">
+              </div>
+
+            </div>
+
+
+
+          </form>
+        </div>
+      </div>
+
+
+
+
+    </div>
+  </div>
+</body>
+
+</html>
+<script>
+  $(() => {
+
+  })
+</script>

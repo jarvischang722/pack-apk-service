@@ -13,5 +13,8 @@
   },
   "timeout": {
     "token": 7200
+  },
+  apk: {
+    buildBatPath : "C:\\build.bat"
   }
 }
