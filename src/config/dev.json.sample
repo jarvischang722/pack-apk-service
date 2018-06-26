@@ -14,7 +14,9 @@
   "timeout": {
     "token": 7200
   },
-  apk: {
-    buildBatPath : "C:\\build.bat"
+  "apk": {
+    "buildBatPath": "C:/Users/Jun/build.bat",
+    "gradlePath" : "C:/Users/Jun/build/AndroidSafetyBrowserChromium/app",
+    "logoPath" : "C:/Users/Jun/build/AndroidSafetyBrowserChromium/app/src/main/res"
   }
 }
