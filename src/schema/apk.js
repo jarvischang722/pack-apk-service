@@ -50,7 +50,7 @@ const resizeLogo = async (apk_name_en) => {
 const reloadGradleFile = async (req) => {
   try {
     // gradlePath defualt : AndroidSafetyBrowserChromium\app
-    let gradleFileCont = fs.readFileSync(`${global.appRoot}/src/build/buildcopy.gradle`, 'utf8')
+    let gradleFileCont = fs.readFileSync(`${global.appRoot}/src/buildcopy.gradle`, 'utf8')
     const { apk_name_en, apk_name, apk_url } = req.body
     let appDomain = req.host.split('.')[1]
     if (req.host.split('.').length === 2) {
