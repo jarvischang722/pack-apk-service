@@ -15,8 +15,8 @@
     "token": 7200
   },
   "apk": {
-    "buildBatPath": "C:/Users/Jun/build.bat",
-    "gradlePath" : "C:/Users/Jun/build/AndroidSafetyBrowserChromium/app",
-    "logoPath" : "C:/Users/Jun/build/AndroidSafetyBrowserChromium/app/src/main/res"
+    "buildBatPath": "C:/Users/build.bat",
+    "rootPath": "C:/Users/build/AndroidSafetyBrowserChromium",
+    "logoPath" : "C:/Users/build/AndroidSafetyBrowserChromium/app/src/main/res"
   }
 }

@@ -16,7 +16,7 @@
   },
   "apk": {
     "buildBatPath": "C:/Users/build.bat",
-    "gradlePath" : "C:/Users/build/AndroidSafetyBrowserChromium/app",
+    "rootPath": "C:/Users/build/AndroidSafetyBrowserChromium",
     "logoPath" : "C:/Users/build/AndroidSafetyBrowserChromium/app/src/main/res"
   }
 }
