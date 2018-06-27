@@ -80,10 +80,14 @@ const reloadGradleFile = async (req) => {
 const runBatchAndBuildApk = async () => new Promise((resolve, reject) => {
   try {
     if (process.platform.indexOf('win') > -1) {
-      require('child_process').exec(`cmd /c ${config.apk.buildBatPath}`, (error, stdout, stderr) => {
+      const child = require('child_process').exec(`cmd /c ${config.apk.buildBatPath}`, (error, stdout, stderr) => {
         if (error) {
           console.error(error)
         }
+      })
+
+      child.stdout.on('data', (data) => {
+        console.log(data.toString())
       })
       resolve()
     } else {
