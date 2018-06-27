@@ -99,7 +99,7 @@ const runBatchAndBuildApk = async (req) => new Promise((resolve, reject) => {
 const build = async (req, callback) => {
   const apkNameEN = req.body.apk_name_en
   try {
-    shell.rm('-rf', `${config.apk.rootPath}/app/build/outputs/apk/`)
+    shell.rm('-rf', `${config.apk.rootPath}/app/build/outputs/apk/*`)
     global.isAPKBuilding = true
     await resizeLogo(req.body.apk_name_en)
     await reloadGradleFile(req)
