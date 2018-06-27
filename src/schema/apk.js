@@ -78,15 +78,11 @@ const reloadGradleFile = async (req) => {
  * Start build app
  */
 const runBatchAndBuildApk = async () => new Promise((resolve, reject) => {
+  const { spawn } = require('child_process')
   try {
     if (process.platform.indexOf('win') > -1) {
-      const child = require('child_process').exec(`cmd /c ${config.apk.buildBatPath}`, (error, stdout, stderr) => {
-        if (error) {
-          console.error(error)
-        }
-      })
-
-      child.stdout.on('data', (data) => {
+      const buildApk = spawn('cmd', ['/c', `${config.apk.buildBatPath}`])
+      buildApk.stdout.on('data', (data) => {
         console.log(data.toString())
       })
       resolve()
@@ -101,22 +97,24 @@ const runBatchAndBuildApk = async () => new Promise((resolve, reject) => {
 const build = async (req, callback) => {
   const apkNameEN = req.body.apk_name_en
   try {
+    global.isAPKBuilding = true
+
     shell.rm('-rf', `${config.apk.rootPath}/app/build/outputs/apk/*`)
     const apkBuildPath = `${config.apk.rootPath}/app/build/outputs/apk/${apkNameEN}/debug`
     shell.mkdir('-p', `${apkBuildPath}`)
 
-    global.isAPKBuilding = true
     await resizeLogo(req.body.apk_name_en)
     await reloadGradleFile(req)
     await runBatchAndBuildApk(req)
+
     const watcherOptions = {
       persistent: true,
       ignoreInitial: true
     }
-
-    const watcher = await chokidar.watch(`${apkBuildPath}/app-${apkNameEN}-debug.txt`, watcherOptions)
+    const watcher = await chokidar.watch(`${apkBuildPath}/app-${apkNameEN}-debug.apk`, watcherOptions)
 
     watcher.on('add', (path) => {
+      console.log(`===== [${apkNameEN}] APK is successfully established! =====`)
       shell.mkdir('-p', `${global.appRoot}/deploy/${apkNameEN}`)
       shell.cp('-f', path, `${global.appRoot}/deploy/${apkNameEN}/`)
       watcher.close()

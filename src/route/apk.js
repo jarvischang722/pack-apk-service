@@ -39,7 +39,8 @@ module.exports = (route, config, exempt) => {
     }
     // It take 2 minnuts  to build  the APK . In order to  allow   user's request  to timeout more time,
     // so it must set the timeout to 3 mins (defualt 2 mins )
-    res.setTimeout(180000)
+    req.setTimeout(360000)
+    res.setTimeout(360000)
     try {
       APK.build(req, (errorMsg) => {
         global.isAPKBuilding = false
