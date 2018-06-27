@@ -9,7 +9,7 @@
   "main": "index.js",
   "scripts": {
     "test": "",
-    "start": "node ./src/index.js"
+    "start": "yarn install && node ./src/index.js"
   },
   "description": "Tripleonetech package service ",
   "repository": "https://git.smartbackend.com/browser/pack-service.git",
@@ -18,6 +18,7 @@
   "dependencies": {
     "babel-eslint": "^8.2.2",
     "body-parser": "^1.17.1",
+    "chokidar": "^2.0.4",
     "cookie-parser": "^1.4.3",
     "cors": "^2.8.4",
     "date-utils": "^1.2.21",
@@ -34,6 +35,7 @@
     "request": "^2.81.0",
     "restify-errors": "^6.1.1",
     "sharp": "^0.20.4",
+    "shelljs": "^0.8.2",
     "supertest": "^3.0.0",
     "uuid": "^3.0.1"
   },

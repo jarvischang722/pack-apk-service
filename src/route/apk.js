@@ -33,9 +33,18 @@ const ERRORS = {
 errors.register(ERRORS)
 
 module.exports = (route, config, exempt) => {
-  const build = async (req, res, next) => {
+  const build = (req, res, next) => {
+    if (global.isAPKBuilding !== undefined && global.isAPKBuilding) {
+      res.status(201).json({ success: false, errorMsg: 'There are others in the build, please wait' })
+    }
+    // It take 2 minnuts  to build  the APK . In order to  allow   user's request  to timeout more time,
+    // so it must set the timeout to 3 mins (defualt 2 mins )
+    res.setTimeout(180000)
     try {
-      return res.json(await APK.build(req))
+      APK.build(req, (errorMsg) => {
+        global.isAPKBuilding = false
+        res.status(201).json({ success: errorMsg === null, errorMsg, params: req.body })
+      })
     } catch (err) {
       return next(err)
     }
