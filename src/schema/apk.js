@@ -69,6 +69,8 @@ const reloadGradleFile = async (req) => {
     gradleFileCont = gradleFileCont.replace(/\@\[appdomain\]/g, appDomain)
 
     fs.writeFileSync(`${config.apk.rootPath}/app/build.gradle`, gradleFileCont, 'utf8')
+
+    return gradleFileCont
   } catch (err) {
     throw new Error(err)
   }
@@ -81,11 +83,11 @@ const runBatchAndBuildApk = async () => new Promise((resolve, reject) => {
   const { spawn } = require('child_process')
   try {
     if (process.platform.indexOf('win') > -1) {
-      const buildApk = spawn('cmd', ['/c', `${config.apk.buildBatPath}`])
-      buildApk.stdout.on('data', (data) => {
+      const buildApkProcess = spawn('cmd', ['/c', `${config.apk.buildBatPath}`])
+      buildApkProcess.stdout.on('data', (data) => {
         console.log(data.toString())
       })
-      resolve()
+      resolve(buildApkProcess)
     } else {
       reject(new Error('Support  "Windows" only.'))
     }
@@ -105,7 +107,7 @@ const build = async (req, callback) => {
 
     await resizeLogo(req.body.apk_name_en)
     await reloadGradleFile(req)
-    await runBatchAndBuildApk(req)
+    const buildApkProcess = await runBatchAndBuildApk(req)
 
     const watcherOptions = {
       persistent: true,
@@ -114,6 +116,7 @@ const build = async (req, callback) => {
     const watcher = await chokidar.watch(`${apkBuildPath}/app-${apkNameEN}-debug.apk`, watcherOptions)
 
     watcher.on('add', (path) => {
+      buildApkProcess.kill()
       console.log(`===== [${apkNameEN}] APK is successfully established! =====`)
       shell.mkdir('-p', `${global.appRoot}/deploy/${apkNameEN}`)
       shell.cp('-f', path, `${global.appRoot}/deploy/${apkNameEN}/`)
