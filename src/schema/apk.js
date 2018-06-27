@@ -76,18 +76,16 @@ const reloadGradleFile = async (req) => {
 
 /**
  * Start build app
- * @param {Object} req
  */
-const runBatchAndBuildApk = async (req) => new Promise((resolve, reject) => {
+const runBatchAndBuildApk = async () => new Promise((resolve, reject) => {
   try {
     if (process.platform.indexOf('win') > -1) {
       require('child_process').exec(`cmd /c ${config.apk.buildBatPath}`, (error, stdout, stderr) => {
         if (error) {
           console.error(error)
-          reject(error)
         }
-        resolve(stdout)
       })
+      resolve()
     } else {
       reject(new Error('Support  "Windows" only.'))
     }
@@ -100,6 +98,9 @@ const build = async (req, callback) => {
   const apkNameEN = req.body.apk_name_en
   try {
     shell.rm('-rf', `${config.apk.rootPath}/app/build/outputs/apk/*`)
+    const apkBuildPath = `${config.apk.rootPath}/app/build/outputs/apk/${apkNameEN}/debug`
+    shell.mkdir('-p', `${apkBuildPath}`)
+
     global.isAPKBuilding = true
     await resizeLogo(req.body.apk_name_en)
     await reloadGradleFile(req)
@@ -108,8 +109,7 @@ const build = async (req, callback) => {
       persistent: true,
       ignoreInitial: true
     }
-    const apkBuildPath = `${config.apk.rootPath}/app/build/outputs/apk/${apkNameEN}/debug`
-    shell.mkdir('-p', `${apkBuildPath}`)
+
     const watcher = await chokidar.watch(`${apkBuildPath}/app-${apkNameEN}-debug.txt`, watcherOptions)
 
     watcher.on('add', (path) => {
