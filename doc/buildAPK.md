@@ -20,3 +20,33 @@ logo        | body/file   | String     | Required   |                         | 
 }
 ```
 ---------------------
+
+####  ✔ `POST` `/apk/getBuildedList ` -  Get APK download url
+
++ Parameters:
+
+Field Name       | Scope | Type       | Attributes | Validation                | Description      
+---------------- | ------- | ----------- | ----------- | -----------------------   | -------------
+         |    |     |  |                               |  
+
+
++ Return: `HTTP Status: 201`
+
+```javascript
+{
+  "data": [
+    [
+      "yahoo",
+      "yahoo_20180101_v304",
+      "http://xxx.com/yahoo_20180101_v304.apk"
+    ],
+    [
+      "yahoo",
+      "yahoo_20180102_v304",
+      "http://xxx.com/yahoo_20180101_v304.apk"
+    ]
+  ]
+    ....
+}
+```
+---------------------

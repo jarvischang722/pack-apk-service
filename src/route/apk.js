@@ -1,4 +1,5 @@
 const multer = require('multer')
+const fs = require('fs')
 const errors = require('../error')
 const { validate, getSchema, T } = require('../validator')
 const { generateToken } = require('../authorization')
@@ -51,7 +52,24 @@ module.exports = (route, config, exempt) => {
     }
   }
 
-  exempt('/apk/build')
+  const getBuildedList = (req, res, next) => {
+    const buildedAPKList = []
+    const deployPath = `${global.appRoot}/deploy`
+    try {
+      fs.readdirSync(`${deployPath}`).forEach((apkName) => {
+        // The latest version in the top
+        const allVersionAPK = fs.readdirSync(`${deployPath}/${apkName}`).sort().reverse()
+        if (allVersionAPK.length > 0) {
+          buildedAPKList.push([apkName, allVersionAPK[0], `${req.protocol}://${req.headers.host}/deploy/${apkName}/${allVersionAPK[0]}`])
+        }
+      })
+    } catch (err) {
+      console.error(err)
+    } finally {
+      res.status(201).json({ data: buildedAPKList })
+    }
+  }
+
 
   const storage = multer.diskStorage({
     destination: 'upload/logo',
@@ -60,5 +78,9 @@ module.exports = (route, config, exempt) => {
     }
   })
 
+  exempt('/apk/build')
+  exempt('/apk/getBuildedList')
+
   route.post('/apk/build', multer({ storage }).single('logo'), build)
+  route.post('/apk/getBuildedList', getBuildedList)
 }
