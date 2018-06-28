@@ -60,7 +60,7 @@ module.exports = (route, config, exempt) => {
         // The latest version in the top
         const allVersionAPK = fs.readdirSync(`${deployPath}/${apkName}`).sort().reverse()
         if (allVersionAPK.length > 0) {
-          buildedAPKList.push([apkName, allVersionAPK[0], `${req.protocol}://${req.headers.host}/deploy/${apkName}/${allVersionAPK[0]}`])
+          buildedAPKList.push([apkName, allVersionAPK[0].replace(/\.apk/g, ''), `${req.protocol}://${req.headers.host}/deploy/${apkName}/${allVersionAPK[0]}`])
         }
       })
     } catch (err) {

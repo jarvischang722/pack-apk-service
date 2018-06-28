@@ -113,7 +113,7 @@ const build = async (req, callback) => {
       persistent: true,
       ignoreInitial: true
     }
-    const watcher = await chokidar.watch(`${apkBuildPath}/app-${apkNameEN}-debug.apk`, watcherOptions)
+    const watcher = await chokidar.watch(`${apkBuildPath}/*.apk`, watcherOptions)
 
     watcher.on('add', (path) => {
       buildApkProcess.kill()
