@@ -30,7 +30,7 @@ const resizeLogo = async (apk_name_en) => {
       }
       sharp(`${global.appRoot}\\upload\\logo\\${apk_name_en}.png`)
         .resize(sizeObj[sizeName], sizeObj[sizeName])
-        .toFile(`${logoDeployPath}\\${sizeName}\\default.png`, (err, info) => {
+        .toFile(`${logoDeployPath}\\${sizeName}\\client_build_icon.png`, (err, info) => {
           if (err) {
             console.error(err)
             reject(err)

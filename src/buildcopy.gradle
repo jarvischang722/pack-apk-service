@@ -32,7 +32,7 @@ android {
             applicationId = "com.Tripleonetech.@[appenglishname]"
             resValue "string", "app_name", "@[appchinesename]"
             manifestPlaceholders = [
-                    appIcon: "@mipmap/default"
+                    appIcon: "@mipmap/client_build_icon"
             ]
             minSdkVersion 21
             buildConfigField "String", "AppName", '"@[appenglishname]"'
