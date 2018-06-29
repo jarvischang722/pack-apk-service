@@ -131,7 +131,7 @@ const build = async (req, callback) => {
       shell.cp('-f', path, `${global.appRoot}/deploy/${apkNameEN}/`)
       watcher.close()
       buildApkProcess.kill()
-      console.log(`build process's pid: [${grep.pid}] was killed.`)
+      console.log(`build process's pid: [${buildApkProcess.pid}] was killed.`)
       clearInterval(countIntv)
       console.log(`===== [${apkNameEN}] APK is successfully established! =====`)
       callback(null)
