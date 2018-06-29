@@ -29,13 +29,12 @@ module.exports = (route, config, exempt) => {
 // so it must set the timeout to 3 mins (defualt 2 mins )
     req.setTimeout(360000)
     res.setTimeout(360000)
-
-    if (global.isAPKBuilding !== undefined && global.isAPKBuilding) {
-      return res.status(201).json({ success: false, errorMsg: 'There are others in the build, please wait' })
-    }
-
     try {
       validate(req.body, getSchema(SCHEMA, 'apk_name', 'apk_name_en', 'apk_url'))
+
+      if (global.isAPKBuilding !== undefined && global.isAPKBuilding) {
+        return res.status(201).json({ success: false, errorMsg: 'There are others in the build, please wait' })
+      }
 
       APK.build(req, (errorMsg) => {
         global.isAPKBuilding = false
