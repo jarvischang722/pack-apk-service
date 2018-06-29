@@ -2,23 +2,13 @@ const multer = require('multer')
 const fs = require('fs')
 const errors = require('../error')
 const { validate, getSchema, T } = require('../validator')
-const { generateToken } = require('../authorization')
+const moment = require('moment')
 const APK = require('../schema/apk')
 
 const SCHEMA = {
-  id: T.number().integer(),
-  role: T.number().integer().valid(1, 2).default(1),
-  name: T.string(),
-  expireIn: T.date().timestamp('unix').raw().allow(null, ''),
-  username: T.string().required(),
-  password: T.string().required(),
-  homeUrl: T.alternatives().try(
-    T.array().items(T.string().uri()),
-    T.string().uri()
-  ).required(),
-  icon: T.string(),
-  page: T.number().integer().min(1).default(1),
-  pagesize: T.number().integer().min(1).default(10),
+  apk_name: T.string().required().trim(),
+  apk_name_en: T.string().required().trim(),
+  apk_url: T.string().required()
 }
 
 const ERRORS = {
@@ -35,20 +25,25 @@ errors.register(ERRORS)
 
 module.exports = (route, config, exempt) => {
   const build = (req, res, next) => {
-    if (global.isAPKBuilding !== undefined && global.isAPKBuilding) {
-      res.status(201).json({ success: false, errorMsg: 'There are others in the build, please wait' })
-    }
-    // It take 2 minnuts  to build  the APK . In order to  allow   user's request  to timeout more time,
-    // so it must set the timeout to 3 mins (defualt 2 mins )
+// It take 2 minnuts  to build  the APK . In order to  allow   user's request  to timeout more time,
+// so it must set the timeout to 3 mins (defualt 2 mins )
     req.setTimeout(360000)
     res.setTimeout(360000)
+
+    if (global.isAPKBuilding !== undefined && global.isAPKBuilding) {
+      return res.status(201).json({ success: false, errorMsg: 'There are others in the build, please wait' })
+    }
+
     try {
+      validate(req.body, getSchema(SCHEMA, 'apk_name', 'apk_name_en', 'apk_url'))
+
       APK.build(req, (errorMsg) => {
         global.isAPKBuilding = false
         res.status(201).json({ success: errorMsg === null, errorMsg, params: req.body })
       })
     } catch (err) {
-      return next(err)
+      console.error(err)
+      res.status(201).json({ success: false, errorMsg: err.message, params: req.body })
     }
   }
 
@@ -57,10 +52,15 @@ module.exports = (route, config, exempt) => {
     const deployPath = `${global.appRoot}/deploy`
     try {
       fs.readdirSync(`${deployPath}`).forEach((apkName) => {
-        // The latest version in the top
-        const allVersionAPK = fs.readdirSync(`${deployPath}/${apkName}`).sort().reverse()
-        if (allVersionAPK.length > 0) {
-          buildedAPKList.push([apkName, allVersionAPK[0].replace(/\.apk/g, ''), `${req.protocol}://${req.headers.host}/deploy/${apkName}/${allVersionAPK[0]}`])
+        const allVerAPK = fs.readdirSync(`${deployPath}/${apkName}`).sort().reverse() // The latest version in the top
+        if (allVerAPK.length > 0) {
+          const apkInfo = {
+            apkName,
+            apkFileName: allVerAPK[0].replace(/\.apk/g, ''),
+            apkUrl: `${req.protocol}://${req.headers.host}/deploy/${apkName}/${allVerAPK[0]}`,
+            apkCreateTime: moment(fs.statSync(`${deployPath}/${apkName}/${allVerAPK[0]}`).birthtime).utc().format('YYYY/MM/DD HH:mm:ss'),
+          }
+          buildedAPKList.push(Object.values(apkInfo))
         }
       })
     } catch (err) {

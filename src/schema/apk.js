@@ -87,6 +87,7 @@ const runBatchAndBuildApk = async () => new Promise((resolve, reject) => {
       buildApkProcess.stdout.on('data', (data) => {
         console.log(data.toString())
       })
+
       resolve(buildApkProcess)
     } else {
       reject(new Error('Support  "Windows" only.'))
@@ -98,6 +99,7 @@ const runBatchAndBuildApk = async () => new Promise((resolve, reject) => {
 
 const build = async (req, callback) => {
   const apkNameEN = req.body.apk_name_en
+  let timeoutSecs = 360
   try {
     global.isAPKBuilding = true
 
@@ -114,13 +116,24 @@ const build = async (req, callback) => {
       ignoreInitial: true
     }
     const watcher = await chokidar.watch(`${apkBuildPath}/*.apk`, watcherOptions)
+    const countIntv = setInterval(() => {
+      if (timeoutSecs === 0) {
+        watcher.close()
+        clearInterval(countIntv)
+        console.log('The builder is timeout. Please retry later.')
+        callback('The builder is timeout. Please retry later.')
+      }
+      timeoutSecs--
+    }, 1000)
 
     watcher.on('add', (path) => {
-      buildApkProcess.kill()
-      console.log(`===== [${apkNameEN}] APK is successfully established! =====`)
       shell.mkdir('-p', `${global.appRoot}/deploy/${apkNameEN}`)
       shell.cp('-f', path, `${global.appRoot}/deploy/${apkNameEN}/`)
       watcher.close()
+      buildApkProcess.kill()
+      console.log(`build process's pid: [${grep.pid}] was killed.`)
+      clearInterval(countIntv)
+      console.log(`===== [${apkNameEN}] APK is successfully established! =====`)
       callback(null)
     })
   } catch (err) {

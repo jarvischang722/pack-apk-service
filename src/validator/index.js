@@ -25,7 +25,7 @@ const validate = (data, schema, ext) => {
   }
   const result = Joi.validate(data, schema)
   if (result.error) {
-    throw new errors.ValidationFailedError(result.error.details[0])
+    throw new Error(result.error.details[0].message)
   }
   if (result.value && Object.keys(data).length > 0) {
     for (const key of Object.keys(data)) {
