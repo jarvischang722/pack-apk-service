@@ -20,6 +20,7 @@
     "chokidar": "^2.0.4",
     "cookie-parser": "^1.4.3",
     "cors": "^2.8.4",
+    "electron-builder": "^19.49.2",
     "express": "^4.15.2",
     "gradle-to-js": "^1.1.0",
     "helmet": "^3.6.0",
