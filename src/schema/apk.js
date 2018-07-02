@@ -82,7 +82,7 @@ const runBatchAndBuildApk = async () => new Promise((resolve, reject) => {
   const { spawn } = require('child_process')
   try {
     if (process.platform.indexOf('win') > -1) {
-      const buildApkProcess = spawn('cmd', ['/c', `${config.apk.buildBatPath}`])
+      const buildApkProcess = spawn('cmd', ['/c', `${config.apk.buildBatPath}`], { windowsHide: true, timeout: 180000 })
       buildApkProcess.stdout.on('data', (data) => {
         console.log(data.toString())
       })
@@ -133,11 +133,11 @@ const build = async (req, callback) => {
     const countIntv = setInterval(async () => {
       if (timeoutSecs === 0) {
         clearInterval(countIntv)
-        buildApkProcess.kill('SIGHUP')
+        buildApkProcess.kill()
         callback('The builder is timeout. Please retry later.')
       } else if (timeoutSecs > 0 && fs.existsSync(apkPath)) {
         clearInterval(countIntv)
-        buildApkProcess.kill('SIGHUP')
+        buildApkProcess.kill()
 
         const apkNewName = await getAPKNewName(apkNameEN, apkPath)
         shell.mkdir('-p', `${global.appRoot}/deploy/${apkNameEN}`)
