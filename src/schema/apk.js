@@ -1,9 +1,7 @@
-const errors = require('../error')
 const config = require('../config')
 const fs = require('fs')
 const sharp = require('sharp')
 const shell = require('shelljs')
-const chokidar = require('chokidar')
 const moment = require('moment')
 
 /**
@@ -29,9 +27,9 @@ const resizeLogo = async (apk_name_en) => {
       if (!fs.existsSync(`${logoDeployPath}/${sizeName}`)) {
         fs.mkdirSync(`${logoDeployPath}/${sizeName}`)
       }
-      sharp(`${global.appRoot}\\upload\\logo\\${apk_name_en}.png`)
+      sharp(`${global.appRoot}/upload/logo/${apk_name_en}.png`)
         .resize(sizeObj[sizeName], sizeObj[sizeName])
-        .toFile(`${logoDeployPath}\\${sizeName}\\client_build_icon.png`, (err, info) => {
+        .toFile(`${logoDeployPath}/${sizeName}/client_build_icon.png`, (err, info) => {
           if (err) {
             console.error(err)
             reject(err)
@@ -98,7 +96,7 @@ const runBatchAndBuildApk = async () => new Promise((resolve, reject) => {
   }
 })
 
-const convgradleToJson = async (path) => new Promise((resolve, reject) => {
+const convGradleToJson = async (path) => new Promise((resolve, reject) => {
   try {
     require('gradle-to-js/lib/parser').parseFile(path).then((gradleObj) => {
       resolve(gradleObj)
@@ -110,7 +108,7 @@ const convgradleToJson = async (path) => new Promise((resolve, reject) => {
 
 
 const getAPKNewName = async (apkNameEN, apkPath) => {
-  const gradleObj = await convgradleToJson(`${global.appRoot}/src/buildcopy.gradle`)
+  const gradleObj = await convGradleToJson(`${global.appRoot}/src/buildcopy.gradle`)
   const version = gradleObj.android.productFlavors['@[appenglishname]'].versionName.replace(/\./g, '')
   const createDate = moment(fs.statSync(`${apkPath}`).birthtime).utc().format('YYYYMMDD')
   const apkNewName = `${apkNameEN}_${createDate}_v${version}.apk`
@@ -125,6 +123,7 @@ const build = async (req, callback) => {
     global.isAPKBuilding = true
     const apkBuildDirPath = `${config.apk.rootPath}/app/build/outputs/apk/${apkNameEN}/debug`
     const apkPath = `${apkBuildDirPath}/app-${apkNameEN}-debug.apk`
+
     shell.rm('-rf', `${config.apk.rootPath}/app/build/outputs/apk/*`)
     shell.mkdir('-p', `${apkBuildDirPath}`)
 
@@ -134,15 +133,16 @@ const build = async (req, callback) => {
     const countIntv = setInterval(async () => {
       if (timeoutSecs === 0) {
         clearInterval(countIntv)
-        console.log('The builder is timeout. Please retry later.')
+        buildApkProcess.kill('SIGHUP')
         callback('The builder is timeout. Please retry later.')
       } else if (timeoutSecs > 0 && fs.existsSync(apkPath)) {
         clearInterval(countIntv)
+        buildApkProcess.kill('SIGHUP')
+
         const apkNewName = await getAPKNewName(apkNameEN, apkPath)
         shell.mkdir('-p', `${global.appRoot}/deploy/${apkNameEN}`)
         shell.cp('-f', apkPath, `${global.appRoot}/deploy/${apkNameEN}/${apkNewName}`)
-        buildApkProcess.kill()
-        console.log(`build process's pid: [${buildApkProcess.pid}] was killed.`)
+
         console.log(`===== [${apkNameEN}] APK is successfully established! =====`)
         callback(null)
       }
