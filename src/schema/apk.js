@@ -140,16 +140,17 @@ const build = async (req, callback) => {
         buildApkProcess.kill()
 
         const apkNewName = await getAPKNewName(apkNameEN, apkPath)
+        const apkDownloadUrl = `${req.protocol}://${req.headers.host}/download/${apkNameEN}/${apkNewName}`
         shell.mkdir('-p', `${global.appRoot}/deploy/${apkNameEN}`)
         shell.cp('-f', apkPath, `${global.appRoot}/deploy/${apkNameEN}/${apkNewName}`)
 
         console.log(`===== [${apkNameEN}] APK is successfully established! =====`)
-        callback(null)
+        callback(null, apkDownloadUrl)
       }
       timeoutSecs--
     }, 1000)
   } catch (err) {
-    callback(typeof err === 'string' ? err : err.message)
+    callback(typeof err === 'string' ? err : err.message, '')
   }
 }
 

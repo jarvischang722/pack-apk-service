@@ -36,13 +36,13 @@ module.exports = (route, config, exempt) => {
         return res.status(201).json({ success: false, errorMsg: 'There are others in the build, please wait' })
       }
 
-      APK.build(req, (errorMsg) => {
+      APK.build(req, (errorMsg, apkUrl) => {
         global.isAPKBuilding = false
-        res.status(201).json({ success: errorMsg === null, errorMsg, params: req.body })
+        res.status(201).json({ success: errorMsg === null, errorMsg, apkUrl })
       })
     } catch (err) {
       console.error(err)
-      res.status(201).json({ success: false, errorMsg: err.message, params: req.body })
+      res.status(201).json({ success: false, errorMsg: err.message })
     }
   }
 
