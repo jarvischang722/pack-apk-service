@@ -56,7 +56,7 @@ module.exports = (route, config, exempt) => {
           const apkInfo = {
             apkName,
             apkFileName: allVerAPK[0].replace(/\.apk/g, ''),
-            apkUrl: `${req.protocol}://${req.headers.host}/deploy/${apkName}/${allVerAPK[0]}`,
+            apkUrl: `${req.protocol}://${req.headers.host}/download/${apkName}/${allVerAPK[0]}`,
             apkCreateTime: moment(fs.statSync(`${deployPath}/${apkName}/${allVerAPK[0]}`).birthtime).utc().format('YYYY/MM/DD HH:mm:ss'),
           }
           buildedAPKList.push(Object.values(apkInfo))
