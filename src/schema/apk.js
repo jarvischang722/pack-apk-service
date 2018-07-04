@@ -110,7 +110,7 @@ const convGradleToJson = async (path) => new Promise((resolve, reject) => {
 const getAPKNewName = async (apkNameEN, apkPath) => {
   try {
     const gradleObj = await convGradleToJson(`${global.appRoot}/src/buildcopy.gradle`)
-    const version = gradleObj.android2.productFlavors['@[appenglishname]'].versionName.replace(/\./g, '')
+    const version = gradleObj.android.productFlavors['@[appenglishname]'].versionName.replace(/\./g, '')
     const createDate = moment(fs.statSync(`${apkPath}`).birthtime).utc().format('YYYYMMDD')
     const apkNewName = `${apkNameEN}_${createDate}_v${version}.apk`
     return apkNewName
