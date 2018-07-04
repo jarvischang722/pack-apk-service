@@ -139,7 +139,8 @@ const build = async (req, callback) => {
           clearInterval(countIntv)
           buildApkProcess.kill()
           callback('The builder is timeout. Please retry later.')
-        } else if (timeoutSecs > 0 && fs.existsSync(apkPath) && fs.statSync(apkPath).size > 0) {
+        } else if (timeoutSecs > 0 && fs.readdirSync(apkBuildDirPath).length > 1
+          && fs.existsSync(apkPath) && fs.statSync(apkPath).size > 0) {
           clearInterval(countIntv)
           buildApkProcess.kill()
 
