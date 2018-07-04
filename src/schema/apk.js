@@ -108,13 +108,16 @@ const convGradleToJson = async (path) => new Promise((resolve, reject) => {
 
 
 const getAPKNewName = async (apkNameEN, apkPath) => {
-  const gradleObj = await convGradleToJson(`${global.appRoot}/src/buildcopy.gradle`)
-  const version = gradleObj.android.productFlavors['@[appenglishname]'].versionName.replace(/\./g, '')
-  const createDate = moment(fs.statSync(`${apkPath}`).birthtime).utc().format('YYYYMMDD')
-  const apkNewName = `${apkNameEN}_${createDate}_v${version}.apk`
-  return apkNewName
+  try {
+    const gradleObj = await convGradleToJson(`${global.appRoot}/src/buildcopy.gradle`)
+    const version = gradleObj.android2.productFlavors['@[appenglishname]'].versionName.replace(/\./g, '')
+    const createDate = moment(fs.statSync(`${apkPath}`).birthtime).utc().format('YYYYMMDD')
+    const apkNewName = `${apkNameEN}_${createDate}_v${version}.apk`
+    return apkNewName
+  } catch (err) {
+    throw new Error(err)
+  }
 }
-
 
 const build = async (req, callback) => {
   const apkNameEN = req.body.apk_name_en
@@ -131,23 +134,30 @@ const build = async (req, callback) => {
     await reloadGradleFile(req)
     const buildApkProcess = await runBatchAndBuildApk(req)
     const countIntv = setInterval(async () => {
-      if (timeoutSecs === 0) {
+      try {
+        if (timeoutSecs === 0) {
+          clearInterval(countIntv)
+          buildApkProcess.kill()
+          callback('The builder is timeout. Please retry later.')
+        } else if (timeoutSecs > 0 && fs.existsSync(apkPath) && fs.statSync(apkPath).size > 0) {
+          clearInterval(countIntv)
+          buildApkProcess.kill()
+
+          const apkNewName = await getAPKNewName(apkNameEN, apkPath)
+          const apkDownloadUrl = `${req.protocol}://${req.headers.host}/download/${apkNameEN}/${apkNewName}`
+          shell.mkdir('-p', `${global.appRoot}/deploy/${apkNameEN}`)
+          shell.cp('-f', apkPath, `${global.appRoot}/deploy/${apkNameEN}/${apkNewName}`)
+
+          console.log(`===== [${apkNameEN}] APK is successfully established! =====`)
+          callback(null, apkDownloadUrl)
+        }
+
+        timeoutSecs--
+      } catch (err) {
         clearInterval(countIntv)
         buildApkProcess.kill()
-        callback('The builder is timeout. Please retry later.')
-      } else if (timeoutSecs > 0 && fs.existsSync(apkPath) && fs.statSync(apkPath).size > 0) {
-        clearInterval(countIntv)
-        buildApkProcess.kill()
-
-        const apkNewName = await getAPKNewName(apkNameEN, apkPath)
-        const apkDownloadUrl = `${req.protocol}://${req.headers.host}/download/${apkNameEN}/${apkNewName}`
-        shell.mkdir('-p', `${global.appRoot}/deploy/${apkNameEN}`)
-        shell.cp('-f', apkPath, `${global.appRoot}/deploy/${apkNameEN}/${apkNewName}`)
-
-        console.log(`===== [${apkNameEN}] APK is successfully established! =====`)
-        callback(null, apkDownloadUrl)
+        callback(err.message, '')
       }
-      timeoutSecs--
     }, 1000)
   } catch (err) {
     callback(typeof err === 'string' ? err : err.message, '')

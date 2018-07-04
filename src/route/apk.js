@@ -30,11 +30,11 @@ module.exports = (route, config, exempt) => {
     req.setTimeout(360000)
     res.setTimeout(360000)
     try {
-      validate(req.body, getSchema(SCHEMA, 'apk_name', 'apk_name_en', 'apk_url'))
-
       if (global.isAPKBuilding !== undefined && global.isAPKBuilding) {
         return res.status(201).json({ success: false, errorMsg: 'There are others in the build, please wait' })
       }
+
+      validate(req.body, getSchema(SCHEMA, 'apk_name', 'apk_name_en', 'apk_url'))
 
       APK.build(req, (errorMsg, apkUrl) => {
         global.isAPKBuilding = false
@@ -42,6 +42,7 @@ module.exports = (route, config, exempt) => {
       })
     } catch (err) {
       console.error(err)
+      global.isAPKBuilding = false
       res.status(201).json({ success: false, errorMsg: err.message })
     }
   }
