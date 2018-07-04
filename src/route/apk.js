@@ -41,7 +41,6 @@ module.exports = (route, config, exempt) => {
         res.status(201).json({ success: errorMsg === null, errorMsg, apkUrl })
       })
     } catch (err) {
-      console.error(err)
       global.isAPKBuilding = false
       res.status(201).json({ success: false, errorMsg: err.message })
     }

@@ -7,9 +7,25 @@
         {
             "type": "node",
             "request": "launch",
+            "name": "Run Tests",
+            "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
+            "args": [
+                "-u",
+                "tdd",
+                "--timeout",
+                "999999",
+                "--colors",
+                "${workspaceFolder}/test"
+            ],
+            "internalConsoleOptions": "openOnSessionStart"
+        },
+        {
+            "type": "node",
+            "request": "launch",
             "console": "integratedTerminal", //internalConsole(default) | integratedTerminal | externalTerminal 
             "name": "Run start",
             "program": "${workspaceFolder}/src/index.js"
         }
+
     ]
 }

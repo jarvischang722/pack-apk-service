@@ -8,7 +8,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "",
+    "test": "cross-env NODE_ENV=test ./node_modules/.bin/mocha -u tdd",
     "start": "yarn install && node ./src/index.js"
   },
   "description": "Tripleonetech package service ",
@@ -40,8 +40,8 @@
   },
   "devDependencies": {
     "babel-eslint": "^8.2.2",
-    "chai": "^4.0.1",
-    "chai-as-promised": "^6.0.0",
+    "chai": "^4.1.2",
+    "chai-as-promised": "^7.1.1",
     "cross-env": "^5.0.0",
     "eslint": "^3.19.0",
     "eslint-config-airbnb": "^15.0.1",
