@@ -1,6 +1,6 @@
 ## Build APK service
 
-####  ✔ `POST` `/apk/build` - APK产出
+####  ✔ `POST` `/apk/build` - APK builder
 
 + Parameters:
 
@@ -38,12 +38,14 @@ Field Name       | Scope | Type       | Attributes | Validation                |
     [
       "yahoo",
       "yahoo_20180101_v304",
-      "http://xxx.com/yahoo_20180101_v304.apk"
+      "http://xxx.com/yahoo_20180101_v304.apk",
+      "2018/07/21 21:05:22"
     ],
     [
       "yahoo",
       "yahoo_20180102_v304",
-      "http://xxx.com/yahoo_20180101_v304.apk"
+      "http://xxx.com/yahoo_20180101_v304.apk",
+      "2018/07/21 21:05:22"
     ]
   ]
     ....

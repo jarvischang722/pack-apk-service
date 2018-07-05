@@ -3,7 +3,8 @@ const fs = require('fs')
 const sharp = require('sharp')
 const shell = require('shelljs')
 const moment = require('moment')
-
+const logger = require('log4js').getLogger()
+const url = require('url')
 /**
  * Resize user uploaded app logo
  * @param {String} apk_name_en : App English name
@@ -31,7 +32,7 @@ const resizeLogo = async (apk_name_en) => {
         .resize(sizeObj[sizeName], sizeObj[sizeName])
         .toFile(`${logoDeployPath}/${sizeName}/client_build_icon.png`, (err, info) => {
           if (err) {
-            console.error(err)
+            logger.error(err)
             reject(err)
           } else {
             resolve(info)
@@ -40,9 +41,9 @@ const resizeLogo = async (apk_name_en) => {
     }))
 
     Promise.all(resizeArr).then(res => {
-      // console.log(res)
+      // logger.info(res)
     }).catch(err => {
-      console.error(err)
+      logger.error(err)
       throw new Error(err)
     })
   } catch (err) {
@@ -52,16 +53,21 @@ const resizeLogo = async (apk_name_en) => {
 
 /**
  * Replace these words [appenglishname, appchinesename, appurl, appdomain]  with  user input
- * @param {Object} req
+ * @param {Object} postData
  */
-const reloadGradleFile = async (req) => {
+const reloadGradleFile = async (postData) => {
   try {
+    const { apk_name_en, apk_name, apk_url } = postData
     let gradleFileCont = fs.readFileSync(`${global.appRoot}/src/buildcopy.gradle`, 'utf8')
-    const { apk_name_en, apk_name, apk_url } = req.body
-    let appDomain = req.hostname.split('.')[1]
-    if (req.hostname.split('.').length === 2) {
-      appDomain = req.hostname.split('.')[0]
+    const urlParseRes = url.parse(apk_url, true)
+    if (!urlParseRes.protocol || !urlParseRes.hostname) {
+      throw new Error(`APK URL illegal (${apk_url}) `)
     }
+    let appDomain = urlParseRes.hostname.split('.')[1]
+    if (urlParseRes.hostname.split('.').length < 3) {
+      appDomain = urlParseRes.hostname.split('.')[0]
+    }
+
     gradleFileCont = gradleFileCont.replace(/\@\[appenglishname\]/g, apk_name_en)
     gradleFileCont = gradleFileCont.replace(/\@\[appchinesename\]/g, apk_name)
     gradleFileCont = gradleFileCont.replace(/\@\[appurl\]/g, apk_url)
@@ -84,7 +90,7 @@ const runBatchAndBuildApk = async () => new Promise((resolve, reject) => {
     if (process.platform.indexOf('win') > -1) {
       const buildApkProcess = spawn('cmd', ['/c', `${config.apk.buildBatPath}`], { windowsHide: true, timeout: 180000 })
       buildApkProcess.stdout.on('data', (data) => {
-        console.log(data.toString())
+        logger.info(data.toString())
       })
 
       resolve(buildApkProcess)
@@ -131,7 +137,7 @@ const build = async (req, callback) => {
     shell.mkdir('-p', `${apkBuildDirPath}`)
 
     await resizeLogo(apkNameEN)
-    await reloadGradleFile(req)
+    await reloadGradleFile(req.body)
     const buildApkProcess = await runBatchAndBuildApk(req)
     const countIntv = setInterval(async () => {
       try {
@@ -149,7 +155,7 @@ const build = async (req, callback) => {
           shell.mkdir('-p', `${global.appRoot}/deploy/${apkNameEN}`)
           shell.cp('-f', apkPath, `${global.appRoot}/deploy/${apkNameEN}/${apkNewName}`)
 
-          console.log(`===== [${apkNameEN}] APK is successfully established! =====`)
+          logger.info(`===== [${apkNameEN}] APK is successfully established! =====`)
           callback(null, apkDownloadUrl)
         }
 

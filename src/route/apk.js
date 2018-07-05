@@ -4,6 +4,7 @@ const errors = require('../error')
 const { validate, getSchema, T } = require('../validator')
 const moment = require('moment')
 const APK = require('../schema/apk')
+const logger = require('log4js').getLogger()
 
 const SCHEMA = {
   apk_name: T.string().required().trim(),
@@ -14,21 +15,18 @@ const SCHEMA = {
 const ERRORS = {
   NoPermission: 403,
   UserNotFound: 404,
-  CreateUserFailed: 400,
-  UserDuplicated: 400,
   ExpireInRequired: 400,
-  InvalidExpireIn: 400,
-  UserExpired: 400,
+  InvalidExpireIn: 400
 }
 
 errors.register(ERRORS)
 
 module.exports = (route, config, exempt) => {
   const build = (req, res, next) => {
-// It take 2 minnuts  to build  the APK . In order to  allow   user's request  to timeout more time,
-// so it must set the timeout to 3 mins (defualt 2 mins )
-    req.setTimeout(360000)
-    res.setTimeout(360000)
+    // It take 2 minnuts to build the APK. In order to  allow  user's request to timeout more time,
+    // so it must set the timeout to 3 mins (defualt 2 mins )
+    req.setTimeout(180000)
+    res.setTimeout(180000)
     try {
       if (global.isAPKBuilding !== undefined && global.isAPKBuilding) {
         return res.status(201).json({ success: false, errorMsg: 'There are others in the build, please wait' })
@@ -63,7 +61,7 @@ module.exports = (route, config, exempt) => {
         }
       })
     } catch (err) {
-      console.error(err)
+      logger.error(err)
     } finally {
       res.status(201).json({ data: buildedAPKList })
     }
