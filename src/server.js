@@ -9,6 +9,8 @@ const errors = require('./error')
 const authorization = require('./authorization')
 const cors = require('cors')
 const path = require('path')
+const https = require('https')
+const fs = require('fs')
 
 const logger = log4js.getLogger()
 
@@ -45,7 +47,7 @@ const server = async () => {
 
   route.bind(apiRouter, config)
 
-    /* eslint-disable no-unused-vars */
+  /* eslint-disable no-unused-vars */
   apiRouter.use((err, req, res, next) => {
     let error = {}
     let statusCode = 500
@@ -65,18 +67,23 @@ const server = async () => {
       error.message = err.message
       statusCode = err.statusCode || statusCode
     }
-   // res.status(statusCode).send({ error })
+    // res.status(statusCode).send({ error })
   })
 
   app.use('/', apiRouter)
 
   const port = config.server.port
+  const sslOptions = {
+    key: fs.readFileSync(`${__dirname}/sslEncryption/androidapk.tripleonetech.net.key`, 'utf8'),
+    cert: fs.readFileSync(`${__dirname}/sslEncryption/androidapk.tripleonetech.net.crt`, 'utf8')
+  }
 
-    /* eslint-disable no-underscore-dangle */
-  if (global.__TEST__) return app
-  return app.listen(port, () => {
-    logger.info(`The server [${config.name}] running on port: ${port}`)
+
+  https.createServer(sslOptions, app).listen(port, () => {
+    logger.info(`The https server [${config.name}] running on port: ${port}`)
   })
+
+  return app
 }
 
 module.exports = () => {
