@@ -58,7 +58,7 @@ const resizeLogo = async (apk_name_en) => {
 const reloadGradleFile = async (postData) => {
   try {
     const { apk_name_en, apk_name, apk_url } = postData
-    let gradleFileCont = fs.readFileSync(`${global.appRoot}/src/buildcopy.gradle`, 'utf8')
+    let gradleFileCont = fs.readFileSync(`${global.appRoot}/src/build/buildcopy.gradle`, 'utf8')
     const urlParseRes = url.parse(apk_url, true)
     if (!urlParseRes.protocol || !urlParseRes.hostname) {
       throw new Error(`APK URL illegal (${apk_url}) `)
@@ -115,7 +115,7 @@ const convGradleToJson = async (path) => new Promise((resolve, reject) => {
 
 const getAPKNewName = async (apkNameEN, apkPath) => {
   try {
-    const gradleObj = await convGradleToJson(`${global.appRoot}/src/buildcopy.gradle`)
+    const gradleObj = await convGradleToJson(`${global.appRoot}/src/build/buildcopy.gradle`)
     const version = gradleObj.android.productFlavors['@[appenglishname]'].versionName.replace(/\./g, '')
     const createDate = moment(fs.statSync(`${apkPath}`).birthtime).utc().format('YYYYMMDD')
     const apkNewName = `${apkNameEN}_${createDate}_v${version}.apk`
