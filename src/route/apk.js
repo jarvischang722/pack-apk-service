@@ -51,14 +51,20 @@ module.exports = (route, config, exempt) => {
     try {
       fs.readdirSync(`${deployPath}`).forEach((apkName) => {
         const allVerAPK = fs.readdirSync(`${deployPath}/${apkName}`).sort().reverse() // The latest version in the top
+        if(allVerAPK.indexOf(`${apkName}.json`)>-1){
+          allVerAPK.splice(allVerAPK.indexOf(`${apkName}.json`))
+        }
+
         if (allVerAPK.length > 0) {
-          const apkInfo = {
-            apkName,
-            apkFileName: allVerAPK[0].replace(/\.apk/g, ''),
-            apkUrl: `${req.protocol}://${req.headers.host}/download/${apkName}/${allVerAPK[0]}`,
-            apkCreateTime: moment(fs.statSync(`${deployPath}/${apkName}/${allVerAPK[0]}`).birthtime).utc().format('YYYY/MM/DD HH:mm:ss'),
-          }
-          buildedAPKList.push(Object.values(apkInfo))
+          allVerAPK.forEach((fileNam)=>{
+            const tmeInfo = {
+              apkName,
+              apkFileName: fileNam.replace(/\.apk/g, ''),
+              apkUrl: `${req.protocol}://${req.headers.host}/download/${apkName}/${fileNam}.`,
+              apkCreateTime: moment(fs.statSync(`${deployPath}/${apkName}/${fileNam}`).birthtime).utc().format('YYYY/MM/DD HH:mm:ss'),
+            }
+            buildedAPKList.push(Object.values(tmeInfo))
+          })
         }
       })
     } catch (err) {

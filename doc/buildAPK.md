@@ -54,3 +54,29 @@ Field Name       | Scope | Type       | Attributes | Validation                |
 }
 ```
 ---------------------
+
+
+####  ✔ `POST` `/apk/getApkInfo ` -  Get APK detail  information
+
++ Parameters:
+
+Field Name       | Scope | Type       | Attributes | Validation                | Description      
+---------------- | ------- | ----------- | ----------- | -----------------------   | -------------
+apkFileName         | body   | String    | Required   |                               | APK  File name
+
+
++ Return: `HTTP Status: 201`
+
+```javascript
+{
+    "success": true,
+    "apkInfo": {
+        "name": "xxxx",
+        "name_en": "xxxx",
+        "url": "https://www.xxxx.com/",
+        "hidden_action_btn": true,
+        "auto_connect_vpn": false
+    }
+}
+```
+---------------------
