@@ -8,7 +8,7 @@ const logger = require('log4js').getLogger()
 
 const SCHEMA = {
   apk_name: T.string().required().trim(),
-  apk_name_en: T.string().required().trim(),
+  apk_name_en: T.string().required().trim().replace(/_/g, '-'),
   apk_url: T.string().required()
 }
 
@@ -23,7 +23,7 @@ errors.register(ERRORS)
 
 module.exports = (route, config, exempt) => {
   const build = (req, res, next) => {
-    // It take 2 minnuts to build the APK. In order to  allow  user's request to timeout more time,
+    // It take 2 minutes to build the APK. In order to  allow  user's request to timeout more time,
     // so it must set the timeout to 3 mins (defualt 2 mins )
     req.setTimeout(180000)
     res.setTimeout(180000)

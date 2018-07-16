@@ -8,8 +8,10 @@ Field Name       | Scope | Type       | Attributes | Validation                |
 ---------------- | ------- | ----------- | ----------- | -----------------------   | -------------
 apk_name         | body   | String    | Required   |                               | APK name
 apk_name_en         | body   | String    | Required   |                               | APK english name 
-apk_url             | body   | String     | Required   |                               | URL
+apk_url             | body   | String     | Required   |                       | URL
 logo        | body/file   | String     | Required   |                         | APK's logo
+hidden_action_btn  | body   | Boolean     | Optional   |             | Whether to  hidden Floating Action Button (**default : false**) 
+ auto_connect_vpn        | body   | Boolean     | Optional   |           | Whether to enable auto connect vpn(**default : false**) 
 
 + Return: `HTTP Status: 201`
 

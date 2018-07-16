@@ -82,7 +82,7 @@ const reloadGradleFile = async (postData) => {
 }
 
 /**
- * Start build app
+ * Start building process
  */
 const runBatchAndBuildApk = async () => new Promise((resolve, reject) => {
   const { spawn } = require('child_process')
@@ -102,6 +102,9 @@ const runBatchAndBuildApk = async () => new Promise((resolve, reject) => {
   }
 })
 
+/**
+ * convert .gradle file to json 
+ */
 const convGradleToJson = async (path) => new Promise((resolve, reject) => {
   try {
     require('gradle-to-js/lib/parser').parseFile(path).then((gradleObj) => {
@@ -112,19 +115,62 @@ const convGradleToJson = async (path) => new Promise((resolve, reject) => {
   }
 })
 
-
+/**
+ * APk name  change a new name that follows the pattern [app name]-[create date YYYYMMDD]-[version without '.'] 
+ * @param {String} apkNameEN 
+ * @param {String} apkPath 
+ */
 const getAPKNewName = async (apkNameEN, apkPath) => {
   try {
     const gradleObj = await convGradleToJson(`${global.appRoot}/src/build/buildcopy.gradle`)
     const version = gradleObj.android.productFlavors['@[appenglishname]'].versionName.replace(/\./g, '')
     const createDate = moment(fs.statSync(`${apkPath}`).birthtime).utc().format('YYYYMMDD')
-    const apkNewName = `${apkNameEN}_${createDate}_v${version}.apk`
+    const apkNewName = `${apkNameEN}_${createDate}_v${version}`
     return apkNewName
   } catch (err) {
     throw new Error(err)
   }
 }
 
+/**
+ * update apk Info 
+ * @param {Object} postData 
+ */
+const updAPKInfoJSONFile = (postData) => {
+  const apkNewName = postData.apkNewName
+  const apkNameEN = postData.apk_name_en
+  let allAPKInfo = {}
+  const apkInfo = {
+    name: postData.apk_name,
+    name_en: postData.apk_name_en,
+    url: postData.apk_url,
+    hidden_action_btn: postData.hidden_action_btn || false,
+    auto_connect_vpn: postData.auto_connect_vpn || false
+  }
+  const apkDir = `${global.appRoot}/deploy/${apkNameEN}`
+
+  if (fs.existsSync(`${apkDir}/${apkNameEN}.json`)) {
+    allAPKInfo = fs.readFileSync(`${apkDir}/${apkNameEN}.json`, 'utf8')
+    if(typeof(allAPKInfo) === 'string')  allAPKInfo = JSON.parse(allAPKInfo) 
+  }
+
+  allAPKInfo[apkNewName] = apkInfo
+
+  // Remove APK does not exist  apkname item of apkNewName in apkDir folder
+  Object.keys(allAPKInfo).forEach((apkVerNam) => {
+    if (!fs.existsSync(`${apkDir}/${apkVerNam}.apk`)) {
+      delete allAPKInfo[apkVerNam]
+    }
+  })
+
+  fs.writeFileSync(`${apkDir}/${apkNameEN}.json`, JSON.stringify(allAPKInfo), 'utf8')
+
+}
+
+
+/**
+ *  Start Building APK
+ */
 const build = async (req, callback) => {
   const apkNameEN = req.body.apk_name_en
   let timeoutSecs = 180
@@ -138,22 +184,30 @@ const build = async (req, callback) => {
 
     await resizeLogo(apkNameEN)
     await reloadGradleFile(req.body)
+
     const buildApkProcess = await runBatchAndBuildApk(req)
+
     const countIntv = setInterval(async () => {
       try {
         if (timeoutSecs === 0) {
+
           clearInterval(countIntv)
           buildApkProcess.kill()
           callback('The builder is timeout. Please retry later.')
+
         } else if (timeoutSecs > 0 && fs.readdirSync(apkBuildDirPath).length > 1
           && fs.existsSync(apkPath) && fs.statSync(apkPath).size > 0) {
+
           clearInterval(countIntv)
           buildApkProcess.kill()
 
           const apkNewName = await getAPKNewName(apkNameEN, apkPath)
-          const apkDownloadUrl = `${req.protocol}://${req.headers.host}/download/${apkNameEN}/${apkNewName}`
+          const apkDownloadUrl = `${req.protocol}://${req.headers.host}/download/${apkNameEN}/${apkNewName}.apk`
+
           shell.mkdir('-p', `${global.appRoot}/deploy/${apkNameEN}`)
-          shell.cp('-f', apkPath, `${global.appRoot}/deploy/${apkNameEN}/${apkNewName}`)
+          shell.cp('-f', apkPath, `${global.appRoot}/deploy/${apkNameEN}/${apkNewName}.apk`)
+
+          updAPKInfoJSONFile(Object.assign({}, req.body, { apkNewName }))
 
           logger.info(`===== [${apkNameEN}] APK is successfully established! =====`)
           callback(null, apkDownloadUrl)
