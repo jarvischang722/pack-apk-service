@@ -57,7 +57,9 @@ const resizeLogo = async (apk_name_en) => {
  */
 const reloadGradleFile = async (postData) => {
   try {
-    const { apk_name_en, apk_name, apk_url } = postData
+
+    const { apk_name_en, apk_name, apk_url, hidden_action_btn, auto_connect_vpn } = postData
+
     let gradleFileCont = fs.readFileSync(`${global.appRoot}/src/build/buildcopy.gradle`, 'utf8')
     const urlParseRes = url.parse(apk_url, true)
     if (!urlParseRes.protocol || !urlParseRes.hostname) {
@@ -72,6 +74,8 @@ const reloadGradleFile = async (postData) => {
     gradleFileCont = gradleFileCont.replace(/\@\[appchinesename\]/g, apk_name)
     gradleFileCont = gradleFileCont.replace(/\@\[appurl\]/g, apk_url)
     gradleFileCont = gradleFileCont.replace(/\@\[appdomain\]/g, appDomain)
+    gradleFileCont = gradleFileCont.replace(/\@\[hiddenactionbtn\]/g, hidden_action_btn || '')
+    gradleFileCont = gradleFileCont.replace(/\@\[autoconnectvpn\]/g, auto_connect_vpn || '')
 
     fs.writeFileSync(`${config.apk.rootPath}/app/build.gradle`, gradleFileCont, 'utf8')
 
@@ -144,7 +148,7 @@ const updAPKInfoJSONFile = (postData) => {
     name: postData.apk_name,
     name_en: postData.apk_name_en,
     url: postData.apk_url,
-    version:apkNewName.split('_')[2],
+    version: apkNewName.split('_')[2],
     hidden_action_btn: postData.hidden_action_btn || false,
     auto_connect_vpn: postData.auto_connect_vpn || false
   }
@@ -236,7 +240,7 @@ const getApkInfo = (req) => {
   const apkName = apkFileName.split('_')[0]
   const apkInfoPath = `${global.appRoot}/deploy/${apkName}/${apkName}.json`
   if (fs.existsSync(apkInfoPath)) {
-    const allInfo = JSON.parse(fs.readFileSync(apkInfoPath,'utf8'))
+    const allInfo = JSON.parse(fs.readFileSync(apkInfoPath, 'utf8'))
     apkInfo = allInfo[apkFileName] || {}
   }
   return apkInfo

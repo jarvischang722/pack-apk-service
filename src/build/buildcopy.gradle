@@ -36,9 +36,11 @@ android {
             ]
             minSdkVersion 21
             buildConfigField "String", "AppName", '"@[appenglishname]"'
-            versionName "3.0.4"
+            versionName "3.0.6"
             buildConfigField "String", "webUrl", '"@[appurl]"'
             buildConfigField "String", "allowHost", '"@[appdomain]"'
+            buildConfigField "boolean" , "isHiddenFAB", "@[hiddenactionbtn]"
+            buildConfigField "boolean" , "isTurnOnVpn", "@[autoconnectvpn]"
         }
 
 
