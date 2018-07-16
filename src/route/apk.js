@@ -9,7 +9,8 @@ const logger = require('log4js').getLogger()
 const SCHEMA = {
   apk_name: T.string().required().trim(),
   apk_name_en: T.string().required().trim().replace(/_/g, '-'),
-  apk_url: T.string().required()
+  apk_url: T.string().required(),
+  apkFileName: T.string().required()
 }
 
 const ERRORS = {
@@ -67,6 +68,18 @@ module.exports = (route, config, exempt) => {
     }
   }
 
+  const getApkInfo = (req, res, next) => {
+
+    try {
+      validate(req.body, getSchema(SCHEMA, 'apkFileName'))
+      const apkInfo = APK.getApkInfo(req)
+      res.status(201).json({ success: true, apkInfo })
+
+    } catch (err) {
+      res.status(201).json({ success: false, errorMsg: err.message })
+    }
+
+  }
 
   const storage = multer.diskStorage({
     destination: 'upload/logo',
@@ -77,7 +90,9 @@ module.exports = (route, config, exempt) => {
 
   exempt('/apk/build')
   exempt('/apk/getBuildedList')
+  exempt('/apk/getApkInfo')
 
   route.post('/apk/build', multer({ storage }).single('logo'), build)
   route.post('/apk/getBuildedList', getBuildedList)
+  route.post('/apk/getApkInfo', getApkInfo)
 }

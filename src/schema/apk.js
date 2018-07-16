@@ -144,6 +144,7 @@ const updAPKInfoJSONFile = (postData) => {
     name: postData.apk_name,
     name_en: postData.apk_name_en,
     url: postData.apk_url,
+    version:apkNewName.split('_')[2],
     hidden_action_btn: postData.hidden_action_btn || false,
     auto_connect_vpn: postData.auto_connect_vpn || false
   }
@@ -151,12 +152,12 @@ const updAPKInfoJSONFile = (postData) => {
 
   if (fs.existsSync(`${apkDir}/${apkNameEN}.json`)) {
     allAPKInfo = fs.readFileSync(`${apkDir}/${apkNameEN}.json`, 'utf8')
-    if(typeof(allAPKInfo) === 'string')  allAPKInfo = JSON.parse(allAPKInfo) 
+    if (typeof (allAPKInfo) === 'string') allAPKInfo = JSON.parse(allAPKInfo)
   }
 
   allAPKInfo[apkNewName] = apkInfo
 
-  // Remove APK does not exist  apkname item of apkNewName in apkDir folder
+  // check every file that if  the APK does not exist  in apkDir then delete this apk name item in the object.  
   Object.keys(allAPKInfo).forEach((apkVerNam) => {
     if (!fs.existsSync(`${apkDir}/${apkVerNam}.apk`)) {
       delete allAPKInfo[apkVerNam]
@@ -225,4 +226,20 @@ const build = async (req, callback) => {
   }
 }
 
-module.exports = { build }
+/**
+ * Get apk detail information from json file
+ * @param {Object} req 
+ */
+const getApkInfo = (req) => {
+  let apkInfo = {}
+  const apkFileName = req.body.apkFileName
+  const apkName = apkFileName.split('_')[0]
+  const apkInfoPath = `${global.appRoot}/deploy/${apkName}/${apkName}.json`
+  if (fs.existsSync(apkInfoPath)) {
+    const allInfo = JSON.parse(fs.readFileSync(apkInfoPath,'utf8'))
+    apkInfo = allInfo[apkFileName] || {}
+  }
+  return apkInfo
+}
+
+module.exports = { build, getApkInfo }
