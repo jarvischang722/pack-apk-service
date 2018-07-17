@@ -73,8 +73,8 @@ const reloadGradleFile = async (postData) => {
     gradleFileCont = gradleFileCont.replace(/\@\[appchinesename\]/g, apk_name)
     gradleFileCont = gradleFileCont.replace(/\@\[appurl\]/g, apk_url)
     gradleFileCont = gradleFileCont.replace(/\@\[appdomain\]/g, appDomain)
-    gradleFileCont = gradleFileCont.replace(/\@\[hiddenactionbtn\]/g, hidden_action_btn || '')
-    gradleFileCont = gradleFileCont.replace(/\@\[autoconnectvpn\]/g, auto_connect_vpn || '')
+    gradleFileCont = gradleFileCont.replace(/\@\[hiddenactionbtn\]/g, hidden_action_btn || false)
+    gradleFileCont = gradleFileCont.replace(/\@\[autoconnectvpn\]/g, auto_connect_vpn || false)
 
     fs.writeFileSync(`${config.apk.rootPath}/app/build.gradle`, gradleFileCont, 'utf8')
 
