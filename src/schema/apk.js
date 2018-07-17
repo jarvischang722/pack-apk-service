@@ -57,7 +57,6 @@ const resizeLogo = async (apk_name_en) => {
  */
 const reloadGradleFile = async (postData) => {
   try {
-
     const { apk_name_en, apk_name, apk_url, hidden_action_btn, auto_connect_vpn } = postData
 
     let gradleFileCont = fs.readFileSync(`${global.appRoot}/src/build/buildcopy.gradle`, 'utf8')
@@ -107,7 +106,7 @@ const runBatchAndBuildApk = async () => new Promise((resolve, reject) => {
 })
 
 /**
- * convert .gradle file to json 
+ * convert .gradle file to json
  */
 const convGradleToJson = async (path) => new Promise((resolve, reject) => {
   try {
@@ -120,9 +119,9 @@ const convGradleToJson = async (path) => new Promise((resolve, reject) => {
 })
 
 /**
- * APk name  change a new name that follows the pattern [app name]-[create date YYYYMMDD]-[version without '.'] 
- * @param {String} apkNameEN 
- * @param {String} apkPath 
+ * APk name  change a new name that follows the pattern [app name]-[create date YYYYMMDD]-[version without '.']
+ * @param {String} apkNameEN
+ * @param {String} apkPath
  */
 const getAPKNewName = async (apkNameEN, apkPath) => {
   try {
@@ -137,8 +136,8 @@ const getAPKNewName = async (apkNameEN, apkPath) => {
 }
 
 /**
- * update apk Info 
- * @param {Object} postData 
+ * update apk Info
+ * @param {Object} postData
  */
 const updAPKInfoJSONFile = (postData) => {
   const apkNewName = postData.apkNewName
@@ -161,7 +160,8 @@ const updAPKInfoJSONFile = (postData) => {
 
   allAPKInfo[apkNewName] = apkInfo
 
-  // check every file that if  the APK does not exist  in apkDir then delete this apk name item in the object.  
+  // check all file that if the APK does not exist in apkDir,
+  // then delete this apk name item in the object.
   Object.keys(allAPKInfo).forEach((apkVerNam) => {
     if (!fs.existsSync(`${apkDir}/${apkVerNam}.apk`)) {
       delete allAPKInfo[apkVerNam]
@@ -169,7 +169,6 @@ const updAPKInfoJSONFile = (postData) => {
   })
 
   fs.writeFileSync(`${apkDir}/${apkNameEN}.json`, JSON.stringify(allAPKInfo), 'utf8')
-
 }
 
 
@@ -195,14 +194,11 @@ const build = async (req, callback) => {
     const countIntv = setInterval(async () => {
       try {
         if (timeoutSecs === 0) {
-
           clearInterval(countIntv)
           buildApkProcess.kill()
           callback('The builder is timeout. Please retry later.')
-
         } else if (timeoutSecs > 0 && fs.readdirSync(apkBuildDirPath).length > 1
           && fs.existsSync(apkPath) && fs.statSync(apkPath).size > 0) {
-
           clearInterval(countIntv)
           buildApkProcess.kill()
 
@@ -232,7 +228,7 @@ const build = async (req, callback) => {
 
 /**
  * Get apk detail information from json file
- * @param {Object} req 
+ * @param {Object} req
  */
 const getApkInfo = (req) => {
   let apkInfo = {}

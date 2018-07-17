@@ -51,12 +51,12 @@ module.exports = (route, config, exempt) => {
     try {
       fs.readdirSync(`${deployPath}`).forEach((apkName) => {
         const allVerAPK = fs.readdirSync(`${deployPath}/${apkName}`).sort().reverse() // The latest version in the top
-        if(allVerAPK.indexOf(`${apkName}.json`)>-1){
+        if (allVerAPK.indexOf(`${apkName}.json`) > -1) {
           allVerAPK.splice(allVerAPK.indexOf(`${apkName}.json`))
         }
 
         if (allVerAPK.length > 0) {
-          allVerAPK.forEach((fileNam)=>{
+          allVerAPK.forEach((fileNam) => {
             const tmeInfo = {
               apkName,
               apkFileName: fileNam.replace(/\.apk/g, ''),
@@ -75,16 +75,13 @@ module.exports = (route, config, exempt) => {
   }
 
   const getApkInfo = (req, res, next) => {
-
     try {
       validate(req.body, getSchema(SCHEMA, 'apkFileName'))
       const apkInfo = APK.getApkInfo(req)
       res.status(201).json({ success: true, apkInfo })
-
     } catch (err) {
       res.status(201).json({ success: false, errorMsg: err.message })
     }
-
   }
 
   const storage = multer.diskStorage({
