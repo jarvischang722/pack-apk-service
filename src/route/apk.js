@@ -60,7 +60,7 @@ module.exports = (route, config, exempt) => {
             const tmeInfo = {
               apkName,
               apkFileName: fileNam.replace(/\.apk/g, ''),
-              apkUrl: `${req.protocol}://${req.headers.host}/download/${apkName}/${fileNam}.`,
+              apkUrl: `${req.protocol}://${req.headers.host}/download/${apkName}/${fileNam}`,
               apkCreateTime: moment(fs.statSync(`${deployPath}/${apkName}/${fileNam}`).birthtime).utc().format('YYYY/MM/DD HH:mm:ss'),
             }
             buildedAPKList.push(Object.values(tmeInfo))
