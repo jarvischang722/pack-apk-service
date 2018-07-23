@@ -8,7 +8,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "build-apidoc": "apidoc -i src/route -o ./doc/apidoc & apidoc-markdown -p  ./doc/apidoc -o ./doc/API.md",
+    "build-apidoc": "apidoc -i src/route -o ./doc/apidoc/output & apidoc-markdown -p ./doc/apidoc/output -o ./doc/API.md -t ./doc/apidoc/templates/default.md",
     "test": "cross-env NODE_ENV=test ./node_modules/.bin/mocha -u tdd",
     "start": "yarn install && node ./src/index.js"
   },

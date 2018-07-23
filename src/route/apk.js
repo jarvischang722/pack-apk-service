@@ -76,7 +76,90 @@ module.exports = (route, config, exempt) => {
   exempt('/apk/getBuildedList')
   exempt('/apk/getApkInfo')
 
+  /**
+* @api {post} /apk/build  Build client apk
+* @apiVersion 1.0.0
+* @apiGroup APK
+*
+* @apiParam {String} apk_name APK name
+* @apiParam {String} apk_name_en APK english name
+* @apiParam {File} logo APK's logo
+* @apiParam {String} apk_url URL
+* @apiParam {Boolean} [hidden_action_btn=false]  Whether to  hidden Floating Action Button
+* @apiParam {Boolean} [auto_connect_vpn=false] Whether to enable auto connect vpn
+*
+* @apiSuccess {Boolean} success
+* @apiSuccess {String} errorMsg
+* @apiSuccess {String} apkUrl Build API url completed
+*
+* @apiSuccessExample Success-Response:
+* HTTP Status: 200
+{
+  "success": true,
+  "errorMsg": '',
+  "apkUrl": 'https://www.xxx.yyy/build/xxxx.apk',
+
+}
+*/
   route.post('/apk/build', multer({ storage }).single('logo'), build)
+
+  /**
+* @api {post} /apk/getBuildedList  Get APK download url
+* @apiVersion 1.0.0
+* @apiGroup APK
+*
+* @apiSuccess (Success 200) {Number} total
+* @apiSuccess (Success 200) {Object[]} items
+* @apiSuccess (Success 200) {String} items.id
+* @apiSuccess (Success 200) {String} items.short
+* @apiSuccess (Success 200) {String} items.long
+* @apiSuccess (Success 200) {String} items.site_name
+* @apiSuccess (Success 200) {String} items.logo_url
+*
+* @apiSuccessExample {json} Success-Response:
+* HTTP Status: 200
+{
+ "data": [
+   [
+     "yahoo",
+     "yahoo_20180101_v304",
+     "http://xxx.com/yahoo_20180101_v304.apk",
+     "2018/07/21 21:05:22"
+   ],
+   [
+     "yahoo",
+     "yahoo_20180102_v304",
+     "http://xxx.com/yahoo_20180101_v304.apk",
+     "2018/07/21 21:05:22"
+   ]
+ ]
+   ....
+}
+*/
   route.post('/apk/getBuildedList', getBuildedList)
+
+  /**
+* @api {post} /apk/getApkInfo  Get APK detail  information
+* @apiVersion 1.0.0
+* @apiGroup APK
+*
+* @apiParam {String} apkFileName APK name
+*
+* @apiSuccess {Boolean} success
+* @apiSuccess {Object} apkInfo
+
+* @apiSuccessExample Success-Response:
+* HTTP Status: 200
+{
+    "success": true,
+    "apkInfo": {
+        "name": "xxxx",
+        "name_en": "xxxx",
+        "url": "https://www.xxxx.com/",
+        "hidden_action_btn": true,
+        "auto_connect_vpn": false
+    }
+}
+*/
   route.post('/apk/getApkInfo', getApkInfo)
 }
