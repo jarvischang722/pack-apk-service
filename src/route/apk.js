@@ -1,8 +1,6 @@
 const multer = require('multer')
-const fs = require('fs')
 const errors = require('../error')
 const { validate, getSchema, T } = require('../validator')
-const moment = require('moment')
 const APK = require('../schema/apk')
 const logger = require('log4js').getLogger()
 
@@ -32,47 +30,28 @@ module.exports = (route, config, exempt) => {
     res.setTimeout(180000)
     try {
       if (global.isAPKBuilding !== undefined && global.isAPKBuilding) {
-        return res.status(201).json({ success: false, errorMsg: 'There are others in the build, please wait' })
+        return res.json({ success: false, errorMsg: 'There are others in the build, please wait' })
       }
 
       validate(req.body, getSchema(SCHEMA, 'apk_name', 'apk_name_en', 'apk_url', 'hidden_action_btn', 'auto_connect_vpn'))
 
       APK.build(req, (errorMsg, apkUrl) => {
         global.isAPKBuilding = false
-        res.status(201).json({ success: errorMsg === null, errorMsg, apkUrl })
+        res.json({ success: errorMsg === null, errorMsg, apkUrl })
       })
     } catch (err) {
       global.isAPKBuilding = false
-      res.status(201).json({ success: false, errorMsg: err.message })
+      res.json({ success: false, errorMsg: err.message })
     }
   }
 
   const getBuildedList = (req, res, next) => {
-    const buildedAPKList = []
-    const deployPath = `${global.appRoot}/deploy`
     try {
-      fs.readdirSync(`${deployPath}`).forEach((apkName) => {
-        const allVerAPK = fs.readdirSync(`${deployPath}/${apkName}`).sort().reverse() // The latest version in the top
-        if (allVerAPK.indexOf(`${apkName}.json`) > -1) {
-          allVerAPK.splice(allVerAPK.indexOf(`${apkName}.json`))
-        }
-
-        if (allVerAPK.length > 0) {
-          allVerAPK.forEach((fileNam) => {
-            const tmeInfo = {
-              apkName,
-              apkFileName: fileNam.replace(/\.apk/g, ''),
-              apkUrl: `${req.protocol}://${req.headers.host}/download/${apkName}/${fileNam}`,
-              apkCreateTime: moment(fs.statSync(`${deployPath}/${apkName}/${fileNam}`).birthtime).utc().format('YYYY/MM/DD HH:mm:ss'),
-            }
-            buildedAPKList.push(Object.values(tmeInfo))
-          })
-        }
-      })
+      const buildedAPKList = APK.getBuildedList(req)
+      res.json({ data: buildedAPKList })
     } catch (err) {
       logger.error(err)
-    } finally {
-      res.status(201).json({ data: buildedAPKList })
+      throw err
     }
   }
 

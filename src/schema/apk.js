@@ -119,7 +119,8 @@ const convGradleToJson = async (path) => new Promise((resolve, reject) => {
 })
 
 /**
- * APk name  change a new name that follows the pattern [app name]-[create date YYYYMMDD]-[version without '.']
+ * APk name  change a new name that follows the pattern
+ * [app name]-[create date YYYYMMDD]-[version without '.']
  * @param {String} apkNameEN
  * @param {String} apkPath
  */
@@ -242,4 +243,32 @@ const getApkInfo = (req) => {
   return apkInfo
 }
 
-module.exports = { build, getApkInfo }
+const getBuildedList = (req) => {
+  const buildedAPKList = []
+  const deployPath = `${global.appRoot}/deploy`
+  try {
+    fs.readdirSync(`${deployPath}`).forEach((apkName) => {
+      const allVerAPK = fs.readdirSync(`${deployPath}/${apkName}`).sort().reverse() // The latest version in the top
+      if (allVerAPK.indexOf(`${apkName}.json`) > -1) {
+        allVerAPK.splice(allVerAPK.indexOf(`${apkName}.json`))
+      }
+
+      if (allVerAPK.length > 0) {
+        allVerAPK.forEach((fileNam) => {
+          const tmeInfo = {
+            apkName,
+            apkFileName: fileNam.replace(/\.apk/g, ''),
+            apkUrl: `${req.protocol}://${req.headers.host}/download/${apkName}/${fileNam}`,
+            apkCreateTime: moment(fs.statSync(`${deployPath}/${apkName}/${fileNam}`).birthtime).utc().format('YYYY/MM/DD HH:mm:ss'),
+          }
+          buildedAPKList.push(Object.values(tmeInfo))
+        })
+      }
+    })
+  } catch (err) {
+    throw err
+  }
+  return buildedAPKList
+}
+
+module.exports = { build, getApkInfo, getBuildedList }

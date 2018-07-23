@@ -8,6 +8,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
+    "build-apidoc": "apidoc -i src/route -o ./doc/apidoc & apidoc-markdown -p  ./doc/apidoc -o ./doc/API.md",
     "test": "cross-env NODE_ENV=test ./node_modules/.bin/mocha -u tdd",
     "start": "yarn install && node ./src/index.js"
   },
@@ -43,6 +44,8 @@
     "uuid": "^3.0.1"
   },
   "devDependencies": {
+    "apidoc": "^0.17.6",
+    "apidoc-markdown": "^0.2.0",
     "babel-eslint": "^8.2.2",
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
