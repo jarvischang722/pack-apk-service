@@ -10,7 +10,9 @@ const SCHEMA = {
   apk_name: T.string().required().trim(),
   apk_name_en: T.string().required().trim().replace(/_/g, '-'),
   apk_url: T.string().required(),
-  apkFileName: T.string().required()
+  apkFileName: T.string().required(),
+  hidden_action_btn: T.boolean(),
+  auto_connect_vpn: T.boolean()
 }
 
 const ERRORS = {
@@ -33,7 +35,7 @@ module.exports = (route, config, exempt) => {
         return res.status(201).json({ success: false, errorMsg: 'There are others in the build, please wait' })
       }
 
-      validate(req.body, getSchema(SCHEMA, 'apk_name', 'apk_name_en', 'apk_url'))
+      validate(req.body, getSchema(SCHEMA, 'apk_name', 'apk_name_en', 'apk_url', 'hidden_action_btn', 'auto_connect_vpn'))
 
       APK.build(req, (errorMsg, apkUrl) => {
         global.isAPKBuilding = false
