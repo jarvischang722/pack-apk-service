@@ -8,6 +8,7 @@ chai.use(charAsPromised)
 before(async () => {
   process.env.NODE_ENV = 'test'
   global.should = chai.should()
+  global.expect = chai.expect
   global.server = await getServer()
   global.env = {}
 })
