@@ -1,0 +1,17 @@
+{
+  "apps": [
+    {
+      "name"                : "browser-pack-service",
+      "script"              : "src/index.js",
+      "ignore_watch"        : ["log", "pid"],
+      "instances"           : 1,
+      "exec_mode"           : "cluster_mode",
+      "env"                 : {
+        "NODE_ENV"          : "production"
+      },
+      "max_memory_restart"  : "1G",
+      "merge_logs"          : true,
+      "max_restarts"        : 30
+    }
+  ]
+}
