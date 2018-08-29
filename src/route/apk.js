@@ -5,8 +5,13 @@ const APK = require('../schema/apk')
 const logger = require('log4js').getLogger()
 
 const SCHEMA = {
-  apk_name: T.string().required().trim(),
-  apk_name_en: T.string().required().trim().replace(/_/g, '-'),
+  apk_name: T.string()
+    .required()
+    .trim(),
+  apk_name_en: T.string()
+    .required()
+    .trim()
+    .replace(/_/g, '-'),
   apk_url: T.string().required(),
   apkFileName: T.string().required(),
   hidden_action_btn: T.boolean(),
@@ -33,7 +38,18 @@ module.exports = (route, config, exempt) => {
         return res.json({ success: false, errorMsg: 'There are others in the build, please wait' })
       }
 
-      validate(req.body, getSchema(SCHEMA, 'apk_name', 'apk_name_en', 'apk_url', 'hidden_action_btn', 'auto_connect_vpn'))
+      validate(
+        req.body,
+        getSchema(
+          SCHEMA,
+          'apk_name',
+          'apk_name_en',
+          'apk_url',
+          'hidden_action_btn',
+          'auto_connect_vpn'
+        )
+      )
+      req.body.kernel = req.body.kernel || 'chromium'
 
       APK.build(req, (errorMsg, apkUrl) => {
         global.isAPKBuilding = false
@@ -51,7 +67,7 @@ module.exports = (route, config, exempt) => {
       res.json({ data: buildedAPKList })
     } catch (err) {
       logger.error(err)
-      throw err
+      res.json({ success: false, errorMsg: err.message })
     }
   }
 
@@ -59,9 +75,9 @@ module.exports = (route, config, exempt) => {
     try {
       validate(req.body, getSchema(SCHEMA, 'apkFileName'))
       const apkInfo = APK.getApkInfo(req)
-      res.status(201).json({ success: true, apkInfo })
+      res.json({ success: true, apkInfo })
     } catch (err) {
-      res.status(201).json({ success: false, errorMsg: err.message })
+      res.json({ success: false, errorMsg: err.message })
     }
   }
 

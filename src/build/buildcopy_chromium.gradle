@@ -1,0 +1,141 @@
+apply plugin: 'com.android.application'
+apply plugin: 'idea'
+
+android {
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
+    defaultConfig {
+        applicationId "org.chromium.chrome"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode rootProject.ext.versionCode
+        versionName rootProject.ext.versionName
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        vectorDrawables.useSupportLibrary = true
+        multiDexEnabled true
+        ndk {
+            abiFilters "armeabi-v7a"
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    dexOptions {
+        javaMaxHeapSize "4g"
+    }
+    aaptOptions {
+        noCompress "dat", "bin", "pak"
+    }
+    sourceSets {
+        main {
+            java.filter.exclude(
+                "com/google/protobuf/*.java",
+                "com/google/protobuf/micro/*.java",
+                "com/google/protobuf/nano/*.java",
+                "com/google/protobuf/nano/android/*.java",
+                "org/chromium/chrome/browser/offlinepages/evaluation/*.java"
+            )
+        }
+    }
+    lintOptions {
+        abortOnError false
+        checkReleaseBuilds false
+        ignoreWarnings true
+        disable 'MissingTranslation'
+    }
+    //for safetybrowser
+    useLibrary 'org.apache.http.legacy'
+    flavorDimensions "product"
+    productFlavors {
+
+
+        @[appenglishname]  { //ok
+            dimension "product"
+            buildConfigField "int", "EName", "1"
+            applicationId = "com.Tripleonetech.@[appenglishname]"
+            resValue "string", "app_name", "@[appchinesename]"
+            manifestPlaceholders = [
+                    appIcon: "@mipmap/default"
+            ]
+            buildConfigField "String", "AppName", '"@[appenglishname]"'
+            versionName "3.0.6"
+            buildConfigField "String", "webUrl", '"@[appurl]"'
+            buildConfigField "String", "allowHost", '"@[appdomain]"'
+            buildConfigField "boolean" , "isHiddenFAB", "@[hiddenactionbtn]"
+            buildConfigField "boolean" , "isTurnOnVpn", "@[autoconnectvpn]"
+        }
+
+    }
+}
+
+idea {
+    module {
+        // downloadJavadoc = true
+        downloadSources = true
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation "com.android.support:appcompat-v7:$rootProject.ext.supportLibraryVersion"
+    implementation "com.android.support:design:$rootProject.ext.supportLibraryVersion"
+    implementation "com.android.support:gridlayout-v7:$rootProject.ext.supportLibraryVersion"
+    implementation "com.android.support:mediarouter-v7:$rootProject.ext.supportLibraryVersion"
+    implementation "com.android.support:support-v13:$rootProject.ext.supportLibraryVersion"
+    implementation "com.google.android.gms:play-services-auth:$rootProject.ext.playServicesVersion"
+    implementation "com.google.android.gms:play-services-cast:$rootProject.ext.playServicesVersion"
+    implementation "com.google.android.gms:play-services-gcm:$rootProject.ext.playServicesVersion"
+    implementation "com.google.android.gms:play-services-identity:$rootProject.ext.playServicesVersion"
+    implementation "com.google.android.gms:play-services-nearby:$rootProject.ext.playServicesVersion"
+    implementation "com.google.android.gms:play-services-vision:$rootProject.ext.playServicesVersion"
+    implementation "com.google.android.gms:play-services-location:$rootProject.ext.playServicesVersion"
+    implementation "com.google.vr:sdk-base:$rootProject.ext.googleVRVersion"
+    implementation 'com.android.support:multidex:1.0.3'
+    implementation 'com.google.code.findbugs:jsr305:3.0.2'
+    implementation 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.4'
+    implementation project(':components:autofill')
+    implementation project(':components:web_contents_delegate')
+    implementation project(':content')
+    implementation project(':data_chart')
+    implementation project(':media')
+    implementation project(':ui')
+    implementation project(':browseractions')
+
+
+    //for safetybrowser
+    implementation 'com.github.clans:fab:1.6.4'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.2'
+    implementation 'com.android.support:cardview-v7:27.1.1'
+
+    implementation 'com.embarkmobile:zxing-android-minimal:2.0.0@aar'
+    implementation 'com.embarkmobile:zxing-android-integration:2.0.0@aar'
+
+    implementation 'com.squareup.retrofit2:retrofit:2.3.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
+
+    implementation 'com.sunfusheng:marqueeview:1.3.3'
+
+    implementation 'org.bouncycastle:bcprov-jdk15on:1.57'
+
+    implementation 'com.github.bumptech.glide:glide:4.7.1'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.7.1'
+
+    androidTestImplementation "com.android.support.test:runner:$rootProject.ext.runnerVersion"
+    androidTestImplementation "com.android.support.test.espresso:espresso-core:$rootProject.ext.espressoVersion"
+    testImplementation "junit:junit:$rootProject.ext.junitVersion"
+}
+repositories {
+    mavenCentral()
+    google()
+    maven {
+        url 'https://raw.github.com/embarkmobile/zxing-android-minimal/mvn-repo/maven-repository/'
+    }
+
+}
