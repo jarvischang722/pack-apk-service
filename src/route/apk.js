@@ -49,7 +49,7 @@ module.exports = (route, config, exempt) => {
           'auto_connect_vpn'
         )
       )
-      req.body.kernel = req.body.kernel || 'chromium'
+      req.body.kernel = req.body.kernel || 'webview'
 
       APK.build(req, (errorMsg, apkUrl) => {
         global.isAPKBuilding = false

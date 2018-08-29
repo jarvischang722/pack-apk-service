@@ -15,8 +15,11 @@
     "token": 7200
   },
   "apk": {
-    "buildBatPath": "C:/Users/build.bat",
-    "rootPath": "C:/Users/build/AndroidSafetyBrowserChromium",
-    "logoPath" : "C:/Users/build/AndroidSafetyBrowserChromium/app/src/main/res"
+    "webview": {
+      "rootPath": "C:/Users/Jun/Projects/WebViewBrowser"
+    },
+    "chromium": {
+      "rootPath": "C:/Users/Jun/Projects/ChromiumBrowser"
+    }
   }
 }

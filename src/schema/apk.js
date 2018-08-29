@@ -11,7 +11,7 @@ const url = require('url')
  */
 const resizeLogo = async postData => {
   const { kernel, apk_name_en } = postData
-  const logoDeployPath = `${config.apk.rootPath[kernel]}/app/src/main/res`
+  const logoDeployPath = `${config.apk[kernel].rootPath}/app/src/main/res`
   const sizeObj = {
     'mipmap-xxxhdpi': 192,
     'mipmap-xxhdpi': 144,
@@ -85,7 +85,7 @@ const reloadGradleFile = async postData => {
     gradleFileCont = gradleFileCont.replace(/\@\[hiddenactionbtn\]/g, hidden_action_btn || false)
     gradleFileCont = gradleFileCont.replace(/\@\[autoconnectvpn\]/g, auto_connect_vpn || false)
 
-    fs.writeFileSync(`${config.apk.rootPath[kernel]}/app/build.gradle`, gradleFileCont, 'utf8')
+    fs.writeFileSync(`${config.apk[kernel].rootPath}/app/build.gradle`, gradleFileCont, 'utf8')
 
     return gradleFileCont
   } catch (err) {
@@ -104,7 +104,7 @@ const runBatch = async postData =>
       if (process.platform.indexOf('win') > -1) {
         const buildApkProcess = spawn(
           'cmd',
-          ['/c', `${config.apk.rootPath[kernel]}/buildapp.bat`],
+          ['/c', `${config.apk[kernel].rootPath}/buildapp.bat`],
           {
             windowsHide: true,
             timeout: 180000
@@ -213,12 +213,10 @@ const build = async (req, callback) => {
   let timeoutSecs = 180
   try {
     global.isAPKBuilding = true
-    const apkBuildDirPath = `${
-      config.apk.rootPath[kernel]
-    }/app/build/outputs/apk/${apkNameEN}/debug`
+    const apkBuildDirPath = `${config.apk[kernel].rootPath}/app/build/outputs/apk/${apkNameEN}/debug`
     const apkPath = `${apkBuildDirPath}/app-${apkNameEN}-debug.apk`
 
-    shell.rm('-rf', `${config.apk.rootPath[kernel]}/app/build/outputs/apk/*`)
+    shell.rm('-rf', `${config.apk[kernel].rootPath}/app/build/outputs/apk/*`)
     shell.mkdir('-p', `${apkBuildDirPath}`)
 
     await resizeLogo(postData)
@@ -307,8 +305,8 @@ const getBuildedList = req => {
           const kernel = apk.kernel || ''
           const logo = apk.logo || ''
           const apkUrl = `${req.protocol}://${req.headers.host}/download/${apkName}/${filename}.apk`
-          const createTime = moment(fs.statSync(`${deployPath}/${apkName}/${filename}.apk`)
-                             .birthtime).utc().format('YYYY/MM/DD HH:mm:ss')
+          const createTime = moment(fs.statSync(`${deployPath}/${apkName}/${filename}.apk`).birthtime)
+                             .utc().format('YYYY/MM/DD HH:mm:ss')
           buildedAPKList.push([name_en, filename, apkUrl, createTime, kernel, logo])
         }
       }
