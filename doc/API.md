@@ -100,13 +100,13 @@ HTTP Status: 200
 ### Success 200
 | Field    | Type        | Description                          |
 |---------|-----------|--------------------------------------|
-| total| Number| |
-| items| Object[]| |
-| items.id| String| |
-| items.short| String| |
-| items.long| String| |
-| items.site_name| String| |
-| items.logo_url| String| |
+| data| Array[]| |
+| data.name| String| |
+| data.filename| String| |
+| data.url| String| |
+| data.createTime| String| |
+| data.kernel| String| |
+| data.logo_url| String| |
 
 ### Success Response
 
@@ -117,16 +117,20 @@ HTTP Status: 200
 {
  "data": [
    [
-     "yahoo",
-     "yahoo_20180101_v304",
-     "http://xxx.com/yahoo_20180101_v304.apk",
-     "2018/07/21 21:05:22"
+     "lanhai",
+     "lanhai_20180829_v306",
+     "http://127.0.0.1:7102/download/lanhai/lanhai_20180829_v306.apk",
+     "2018/08/29 06:32:05",
+     "chromium",
+     "http://127.0.0.1:7102/download/lanhai/lanhai_20180829_v306.png"
    ],
    [
-     "yahoo",
-     "yahoo_20180102_v304",
-     "http://xxx.com/yahoo_20180101_v304.apk",
-     "2018/07/21 21:05:22"
+     "lanhai",
+     "lanhai_20180829_v306",
+     "http://127.0.0.1:7102/download/lanhai/lanhai_20180829_v306.apk",
+     "2018/08/29 06:32:05",
+     "chromium",
+     "http://127.0.0.1:7102/download/lanhai/lanhai_20180829_v306.png"
    ]
  ]
    ....

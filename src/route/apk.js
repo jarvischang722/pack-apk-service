@@ -124,29 +124,33 @@ module.exports = (route, config, exempt) => {
 * @apiVersion 1.0.0
 * @apiGroup APK
 *
-* @apiSuccess (Success 200) {Number} total
-* @apiSuccess (Success 200) {Object[]} items
-* @apiSuccess (Success 200) {String} items.id
-* @apiSuccess (Success 200) {String} items.short
-* @apiSuccess (Success 200) {String} items.long
-* @apiSuccess (Success 200) {String} items.site_name
-* @apiSuccess (Success 200) {String} items.logo_url
+* @apiSuccess (Success 200) {Array[]} data
+* @apiSuccess (Success 200) {String} data.name
+* @apiSuccess (Success 200) {String} data.filename
+* @apiSuccess (Success 200) {String} data.url
+* @apiSuccess (Success 200) {String} data.createTime
+* @apiSuccess (Success 200) {String} data.kernel
+* @apiSuccess (Success 200) {String} data.logo_url
 *
 * @apiSuccessExample {json} Success-Response:
 * HTTP Status: 200
 {
  "data": [
    [
-     "yahoo",
-     "yahoo_20180101_v304",
-     "http://xxx.com/yahoo_20180101_v304.apk",
-     "2018/07/21 21:05:22"
+     "lanhai",
+     "lanhai_20180829_v306",
+     "http://127.0.0.1:7102/download/lanhai/lanhai_20180829_v306.apk",
+     "2018/08/29 06:32:05",
+     "chromium",
+     "http://127.0.0.1:7102/download/lanhai/lanhai_20180829_v306.png"
    ],
    [
-     "yahoo",
-     "yahoo_20180102_v304",
-     "http://xxx.com/yahoo_20180101_v304.apk",
-     "2018/07/21 21:05:22"
+     "lanhai",
+     "lanhai_20180829_v306",
+     "http://127.0.0.1:7102/download/lanhai/lanhai_20180829_v306.apk",
+     "2018/08/29 06:32:05",
+     "chromium",
+     "http://127.0.0.1:7102/download/lanhai/lanhai_20180829_v306.png"
    ]
  ]
    ....
