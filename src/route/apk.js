@@ -15,7 +15,8 @@ const SCHEMA = {
   apk_url: T.string().required(),
   apkFileName: T.string().required(),
   hidden_action_btn: T.boolean(),
-  auto_connect_vpn: T.boolean()
+  auto_connect_vpn: T.boolean(),
+  kernel: T.string()
 }
 
 const ERRORS = {
@@ -46,7 +47,8 @@ module.exports = (route, config, exempt) => {
           'apk_name_en',
           'apk_url',
           'hidden_action_btn',
-          'auto_connect_vpn'
+          'auto_connect_vpn',
+          'kernel'
         )
       )
       req.body.kernel = req.body.kernel || 'webview'
