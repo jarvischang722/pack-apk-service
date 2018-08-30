@@ -301,7 +301,7 @@ const getBuildedList = req => {
         for (const apkname of Object.keys(apkList)) {
           const apk = apkList[apkname]
           const name_en = apk.name_en
-          const filename = apk.filename || name_en
+          const filename = apkname
           const kernel = apk.kernel || ''
           const logo = apk.logo || ''
           const apkUrl = `${req.protocol}://${req.headers.host}/download/${apkName}/${filename}.apk`
