@@ -34,7 +34,7 @@ Tripleonetech package service
 | Field    | Type        | Description                          |
 |---------|-----------|--------------------------------------|
 | success| Boolean| |
-| errorMsg| String| |
+| message| String| |
 | apkUrl| String| <p>Build API url completed</p>|
 
 ### Success Response
@@ -45,7 +45,7 @@ Success-Response:
 HTTP Status: 200
 {
   "success": true,
-  "errorMsg": '',
+  "message": '',
   "apkUrl": 'https://www.xxx.yyy/build/xxxx.apk',
 
 }

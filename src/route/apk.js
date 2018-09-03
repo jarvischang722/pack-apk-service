@@ -36,7 +36,7 @@ module.exports = (route, config, exempt) => {
     res.setTimeout(180000)
     try {
       if (global.isAPKBuilding !== undefined && global.isAPKBuilding) {
-        return res.json({ success: false, errorMsg: 'There are others in the build, please wait' })
+        return res.json({ success: false, message: 'There are others in the build, please wait' })
       }
 
       validate(
@@ -53,13 +53,13 @@ module.exports = (route, config, exempt) => {
       )
       req.body.kernel = req.body.kernel || 'webview'
 
-      APK.build(req, (errorMsg, apkUrl) => {
-        global.isAPKBuilding = false
-        res.json({ success: errorMsg === null, errorMsg, apkUrl })
+      APK.build(req, (error, apkUrl) => {
+        const message = error ? error.message : null
+        res.json({ success: error === null, message, apkUrl })
       })
     } catch (err) {
       global.isAPKBuilding = false
-      res.json({ success: false, errorMsg: err.message })
+      res.json({ success: false, message: err.message })
     }
   }
 
@@ -69,7 +69,7 @@ module.exports = (route, config, exempt) => {
       res.json({ data: buildedAPKList })
     } catch (err) {
       logger.error(err)
-      res.json({ success: false, errorMsg: err.message })
+      res.json({ success: false, message: err.message })
     }
   }
 
@@ -79,7 +79,7 @@ module.exports = (route, config, exempt) => {
       const apkInfo = APK.getApkInfo(req)
       res.json({ success: true, apkInfo })
     } catch (err) {
-      res.json({ success: false, errorMsg: err.message })
+      res.json({ success: false, message: err.message })
     }
   }
 
@@ -107,14 +107,14 @@ module.exports = (route, config, exempt) => {
 * @apiParam {Boolean} [auto_connect_vpn=false] Whether to enable auto connect vpn
 *
 * @apiSuccess {Boolean} success
-* @apiSuccess {String} errorMsg
+* @apiSuccess {String} message
 * @apiSuccess {String} apkUrl Build API url completed
 *
 * @apiSuccessExample Success-Response:
 * HTTP Status: 200
 {
   "success": true,
-  "errorMsg": '',
+  "message": '',
   "apkUrl": 'https://www.xxx.yyy/build/xxxx.apk',
 
 }

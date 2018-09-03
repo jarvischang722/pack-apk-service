@@ -4,18 +4,17 @@ const shell = require('shelljs')
 const fs = require('fs')
 const config = require('../src/config')
 
-
 const apk_name = 'tripleoneTest'
 const apk_name_en = 'tripleoneTest'
 const apk_url = 'http://www.tripleone.com'
 const hidden_action_btn = true
 const auto_connect_vpn = true
-const kernel = 'webview'
 const apkFileName = `jun-${moment().format('YYYYMMDD')}-v304`
 const apkDeployPath = `${__dirname}/../deploy/${apk_name_en}`
 
 describe('APK test -', () => {
-  it('build apk', done => {
+  it('build apk for webview', done => {
+    const kernel = 'webview'
     client()
       .post('/apk/build')
       .set('Content-Type', 'multipart/form-data')
@@ -35,7 +34,10 @@ describe('APK test -', () => {
 
         // Check if complete build apk exist
         expect(fs.existsSync(`${apkDeployPath}/${apk_name_en}.json`)).to.be.true
-        const apkInfoList = JSON.parse(fs.readFileSync(`${apkDeployPath}/${apk_name_en}.json`), 'utf8')
+        const apkInfoList = JSON.parse(
+          fs.readFileSync(`${apkDeployPath}/${apk_name_en}.json`),
+          'utf8'
+        )
         expect(Object.keys(apkInfoList).length).to.equal(1)
         const apkFileNam = Object.keys(apkInfoList)[0]
         const apkInfo = apkInfoList[apkFileNam]
@@ -43,22 +45,22 @@ describe('APK test -', () => {
         expect(apkInfo).have.property('name_en')
         expect(apkInfo).have.property('url')
         expect(apkInfo).have.property('version')
-        expect(apkInfo).have.property('filename')
+        expect(apkInfo).have.property('fileName')
         expect(apkInfo).have.property('hidden_action_btn')
         expect(apkInfo).have.property('auto_connect_vpn')
         expect(apkInfo).have.property('logo')
         expect(apkInfo).have.property('kernel')
         expect(fs.existsSync(`${apkDeployPath}/${apkFileNam}.apk`)).to.be.true
         expect(fs.existsSync(`${apkDeployPath}/${apkFileNam}.png`)).to.be.true
-
-
         done()
       })
     setTimeout(() => {
       shell.cp(
         '-R',
         `${__dirname}/files/apk/app-tripleoneTest-debug.apk`,
-        `${config.apk[kernel].rootPath}/app/build/outputs/apk/${apk_name_en}/debug/app-${apk_name_en}-debug.apk`
+        `${
+          config.apk[kernel].rootPath
+        }/app/build/outputs/apk/${apk_name_en}/debug/app-${apk_name_en}-debug.apk`
       )
       shell.cp(
         '-R',
@@ -142,7 +144,7 @@ describe('APK test -', () => {
   })
 
   it('delete apk in deploy', done => {
-    shell.rm('-rf', apkDeployPath)
+    // shell.rm('-rf', apkDeployPath)
     done()
   })
 })

@@ -152,7 +152,7 @@ const getAPKNewName = async (apkNameEN, apkPath, kernel) => {
       `${global.appRoot}/src/build/buildcopy_${kernel}.gradle`
     )
     const version = gradleObj.android.productFlavors['@[appenglishname]'].versionName.replace(
-      /\./g,
+      /\.|\"/g,
       ''
     )
 
@@ -162,7 +162,7 @@ const getAPKNewName = async (apkNameEN, apkPath, kernel) => {
     const apkNewName = `${apkNameEN}_${createDate}_v${version}`
     return apkNewName
   } catch (err) {
-    throw new Error(err)
+    throw err
   }
 }
 
@@ -171,37 +171,41 @@ const getAPKNewName = async (apkNameEN, apkPath, kernel) => {
  * @param {Object} postData
  */
 const updApkInfoToJsonFile = postData => {
-  const { filename, apk_name, apk_name_en, apk_url, logo, kernel } = postData
-  let allAPKInfo = {}
-  const apkInfo = {
-    name: apk_name,
-    name_en: apk_name_en,
-    url: apk_url,
-    version: filename.split('_')[2],
-    filename,
-    hidden_action_btn: postData.hidden_action_btn || false,
-    auto_connect_vpn: postData.auto_connect_vpn || false,
-    logo,
-    kernel
-  }
-  const apkDir = `${global.appRoot}/deploy/${apk_name_en}`
-
-  if (fs.existsSync(`${apkDir}/${apk_name_en}.json`)) {
-    allAPKInfo = fs.readFileSync(`${apkDir}/${apk_name_en}.json`, 'utf8')
-    if (typeof allAPKInfo === 'string') allAPKInfo = JSON.parse(allAPKInfo)
-  }
-
-  allAPKInfo[filename] = apkInfo
-
-  // check all file that if the APK does not exist in apkDir,
-  // then delete this apk name item in the object.
-  Object.keys(allAPKInfo).forEach(apkVerNam => {
-    if (!fs.existsSync(`${apkDir}/${apkVerNam}.apk`)) {
-      delete allAPKInfo[apkVerNam]
+  try {
+    const { fileName, apk_name, apk_name_en, apk_url, logo, kernel } = postData
+    let allAPKInfo = {}
+    const apkInfo = {
+      name: apk_name,
+      name_en: apk_name_en,
+      url: apk_url,
+      version: fileName.split('_')[2],
+      fileName,
+      hidden_action_btn: postData.hidden_action_btn || false,
+      auto_connect_vpn: postData.auto_connect_vpn || false,
+      logo,
+      kernel
     }
-  })
+    const apkDir = `${global.appRoot}/deploy/${apk_name_en}`
 
-  fs.writeFileSync(`${apkDir}/${apk_name_en}.json`, JSON.stringify(allAPKInfo), 'utf8')
+    if (fs.existsSync(`${apkDir}/${apk_name_en}.json`)) {
+      allAPKInfo = fs.readFileSync(`${apkDir}/${apk_name_en}.json`, 'utf8')
+      if (typeof allAPKInfo === 'string') allAPKInfo = JSON.parse(allAPKInfo)
+    }
+
+    allAPKInfo[fileName] = apkInfo
+
+    // check all file that if the APK does not exist in apkDir,
+    // then delete this apk name item in the object.
+    Object.keys(allAPKInfo).forEach(apkVerNam => {
+      if (!fs.existsSync(`${apkDir}/${apkVerNam}.apk`)) {
+        delete allAPKInfo[apkVerNam]
+      }
+    })
+
+    fs.writeFileSync(`${apkDir}/${apk_name_en}.json`, JSON.stringify(allAPKInfo), 'utf8')
+  } catch (err) {
+    throw err
+  }
 }
 
 /**
@@ -210,11 +214,12 @@ const updApkInfoToJsonFile = postData => {
 const build = async (req, callback) => {
   const postData = req.body
   const { kernel, apk_name_en: apkNameEN } = postData
-  let timeoutSecs = 180
+
   try {
     global.isAPKBuilding = true
-    const apkBuildDirPath = `${config.apk[kernel].rootPath}/app/build/outputs/apk/${apkNameEN}/debug`
-    const apkPath = `${apkBuildDirPath}/app-${apkNameEN}-debug.apk`
+    const apkBuildDirPath = `${
+      config.apk[kernel].rootPath
+    }/app/build/outputs/apk/${apkNameEN}/debug`
 
     shell.rm('-rf', `${config.apk[kernel].rootPath}/app/build/outputs/apk/*`)
     shell.mkdir('-p', `${apkBuildDirPath}`)
@@ -223,51 +228,76 @@ const build = async (req, callback) => {
     await reloadGradleFile(postData)
 
     const buildApkProcess = await runBatch(postData)
-
-    const countIntv = setInterval(async () => {
-      try {
-        if (timeoutSecs === 0) {
-          clearInterval(countIntv)
-          buildApkProcess.kill()
-          callback('The builder is timeout. Please retry later.')
-        } else if (
-          timeoutSecs > 0 &&
-          fs.readdirSync(apkBuildDirPath).length > 1 &&
-          fs.existsSync(apkPath) &&
-          fs.statSync(apkPath).size > 0
-        ) {
-          clearInterval(countIntv)
-          buildApkProcess.kill()
-
-          const filename = await getAPKNewName(apkNameEN, apkPath, kernel)
-          const filePath = `${req.protocol}://${req.headers.host}/download/${apkNameEN}/${filename}`
-          const apkUrl = `${filePath}.apk`
-          const logo = `${filePath}.png`
-
-          shell.mkdir('-p', `${global.appRoot}/deploy/${apkNameEN}`)
-          shell.cp('-f', apkPath, `${global.appRoot}/deploy/${apkNameEN}/${filename}.apk`)
-          shell.cp(
-            '-f',
-            `${global.appRoot}/upload/logo/${apkNameEN}.png`,
-            `${global.appRoot}/deploy/${apkNameEN}/${filename}.png`
-          )
-
-          const apkData = Object.assign({}, req.body, { filename, apkUrl, kernel, logo })
-          updApkInfoToJsonFile(apkData, req)
-
-          logger.info(`===== [${apkNameEN}] APK is successfully established! =====`)
-          callback(null, apkUrl)
-        }
-
-        timeoutSecs--
-      } catch (err) {
-        clearInterval(countIntv)
-        buildApkProcess.kill()
-        callback(err.message, '')
-      }
-    }, 1000)
+    listenBuildApkResult(req, buildApkProcess, callback)
   } catch (err) {
-    callback(typeof err === 'string' ? err : err.message, '')
+    global.isAPKBuilding = false
+    callback(err, '')
+  }
+}
+
+const listenBuildApkResult = (req, buildApkProcess, callback) => {
+  const { kernel, apk_name_en: apkNameEN } = req.body
+  let timeoutSecs = 180
+  const apkBuildDirPath = `${config.apk[kernel].rootPath}/app/build/outputs/apk/${apkNameEN}/debug`
+  const apkPath = `${apkBuildDirPath}/app-${apkNameEN}-debug.apk`
+
+  const countIntv = setInterval(async () => {
+    try {
+      if (timeoutSecs === 0) {
+        stopListener(countIntv, buildApkProcess)
+        if (kernel === 'webview') callback('The builder is timeout. Please retry later.')
+      } else if (
+        timeoutSecs > 0 &&
+        fs.readdirSync(apkBuildDirPath).length > 1 &&
+        fs.existsSync(apkPath) &&
+        fs.statSync(apkPath).size > 0
+      ) {
+        const fileName = await getAPKNewName(apkNameEN, apkPath, kernel)
+        const filePath = `${req.protocol}://${req.headers.host}/download/${apkNameEN}/${fileName}`
+        const apkUrl = `${filePath}.apk`
+        const logo = `${filePath}.png`
+
+        shell.mkdir('-p', `${global.appRoot}/deploy/${apkNameEN}`)
+        shell.cp('-f', apkPath, `${global.appRoot}/deploy/${apkNameEN}/tripleoneTest_20180903_v306.apk`)
+
+        shell.cp(
+          '-f',
+          `${global.appRoot}/upload/logo/${apkNameEN}.png`,
+          `${global.appRoot}/deploy/${apkNameEN}/tripleoneTest_20180903_v306.png`)
+
+
+        const apkData = Object.assign({}, req.body, { fileName, apkUrl, kernel, logo })
+        updApkInfoToJsonFile(apkData)
+
+        stopListener(countIntv, buildApkProcess)
+
+        logger.info(`===== APK[${apkNameEN}] is successfully established. =====`)
+
+        if (kernel === 'webview') callback(null, apkUrl)
+      }
+
+      timeoutSecs--
+    } catch (err) {
+      logger.error(`===== APK[${apkNameEN}] built failed. =====`)
+      logger.error(err)
+      stopListener(countIntv, buildApkProcess)
+
+      if (kernel === 'webview') callback(err)
+    }
+  }, 1000)
+
+  if (kernel === 'chromium') {
+    callback(null)
+  }
+}
+
+const stopListener = (countIntv, buildApkProcess) => {
+  try {
+    global.isAPKBuilding = false
+    clearInterval(countIntv)
+    buildApkProcess.kill()
+  } catch (err) {
+    throw err
   }
 }
 
@@ -297,17 +327,22 @@ const getBuildedList = req => {
   try {
     fs.readdirSync(`${deployPath}`).forEach(apkName => {
       if (fs.existsSync(`${deployPath}/${apkName}/${apkName}.json`)) {
-        const apkList = JSON.parse(fs.readFileSync(`${deployPath}/${apkName}/${apkName}.json`, 'utf8'))
+        const apkList = JSON.parse(
+          fs.readFileSync(`${deployPath}/${apkName}/${apkName}.json`, 'utf8')
+        )
         for (const apkname of Object.keys(apkList)) {
           const apk = apkList[apkname]
           const name_en = apk.name_en
-          const filename = apkname
+          const fileName = apkname
           const kernel = apk.kernel || ''
           const logo = apk.logo || ''
-          const apkUrl = `${req.protocol}://${req.headers.host}/download/${apkName}/${filename}.apk`
-          const createTime = moment(fs.statSync(`${deployPath}/${apkName}/${filename}.apk`).birthtime)
-                             .utc().format('YYYY/MM/DD HH:mm:ss')
-          buildedAPKList.push([name_en, filename, apkUrl, createTime, kernel, logo])
+          const apkUrl = `${req.protocol}://${req.headers.host}/download/${apkName}/${fileName}.apk`
+          const createTime = moment(
+            fs.statSync(`${deployPath}/${apkName}/${fileName}.apk`).birthtime
+          )
+            .utc()
+            .format('YYYY/MM/DD HH:mm:ss')
+          buildedAPKList.push([name_en, fileName, apkUrl, createTime, kernel, logo])
         }
       }
     })
