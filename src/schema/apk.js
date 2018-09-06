@@ -258,14 +258,17 @@ const listenBuildApkResult = (req, buildApkProcess, callback) => {
         const logo = `${filePath}.png`
 
         shell.mkdir('-p', `${global.appRoot}/deploy/${apkNameEN}`)
-        shell.cp('-f', apkPath, `${global.appRoot}/deploy/${apkNameEN}/tripleoneTest_20180903_v306.apk`)
+        shell.cp(
+          '-f',
+          apkPath,
+          `${global.appRoot}/deploy/${apkNameEN}/${fileName}.apk`
+        )
 
         shell.cp(
           '-f',
           `${global.appRoot}/upload/logo/${apkNameEN}.png`,
-          `${global.appRoot}/deploy/${apkNameEN}/tripleoneTest_20180903_v306.png`)
-
-
+          `${global.appRoot}/deploy/${apkNameEN}/${fileName}.png`
+        )
         const apkData = Object.assign({}, req.body, { fileName, apkUrl, kernel, logo })
         updApkInfoToJsonFile(apkData)
 
