@@ -290,7 +290,7 @@ const listenBuildApkResult = (req, buildApkProcess, callback) => {
   }, 1000)
 
   if (kernel === 'chromium') {
-    callback(null)
+    callback(null, '')
   }
 }
 
