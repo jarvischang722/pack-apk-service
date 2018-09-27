@@ -12,6 +12,7 @@ const url = require('url')
 const resizeLogo = async postData => {
   const { kernel, apk_name_en } = postData
   const logoDeployPath = `${config.apk[kernel].rootPath}/app/src/main/res`
+  const defaultImgName = 'client_build_icon'
   const sizeObj = {
     'mipmap-xxxhdpi': 192,
     'mipmap-xxhdpi': 144,
@@ -31,9 +32,11 @@ const resizeLogo = async postData => {
           if (!fs.existsSync(`${logoDeployPath}/${sizeName}`)) {
             fs.mkdirSync(`${logoDeployPath}/${sizeName}`)
           }
+          const imagePath = `${logoDeployPath}/${sizeName}/${defaultImgName}.png`
+          shell.rm('-f', `${imagePath}`)
           sharp(`${global.appRoot}/upload/logo/${apk_name_en}.png`)
             .resize(sizeObj[sizeName], sizeObj[sizeName])
-            .toFile(`${logoDeployPath}/${sizeName}/client_build_icon.png`, (err, info) => {
+            .toFile(`${imagePath}`, (err, info) => {
               if (err) {
                 logger.error(err)
                 reject(err)
