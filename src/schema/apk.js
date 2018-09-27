@@ -297,14 +297,33 @@ const listenBuildApkResult = (req, buildApkProcess, callback) => {
   }
 }
 
-const stopListener = (countIntv, buildApkProcess) => {
+const stopListener = async (countIntv, buildApkProcess) => {
   try {
     global.isAPKBuilding = false
     clearInterval(countIntv)
     buildApkProcess.kill()
+    await killJavaProcess()
   } catch (err) {
     throw err
   }
+}
+
+/**
+ * Kill Java process by pid
+ */
+const killJavaProcess = () => {
+  const { snapshot } = require('process-list')
+  return new Promise((resolve, reject) => {
+    try {
+      snapshot('pid', 'name').then(tasks => {
+        const process = tasks.find((task) => task.name === 'java.exe')
+        if (process) process.kill(process.pid, 'SIGHUP')
+        resolve()
+      })
+    } catch (err) {
+      reject(err)
+    }
+  })
 }
 
 /**
