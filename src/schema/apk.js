@@ -316,8 +316,11 @@ const killJavaProcess = () => {
   return new Promise((resolve, reject) => {
     try {
       snapshot('pid', 'name').then(tasks => {
-        const process = tasks.find((task) => task.name === 'java.exe')
-        if (process) process.kill(process.pid, 'SIGHUP')
+        const javaProcs = tasks.filter((task) => task.name === 'java.exe')
+        javaProcs.forEach((proc) => {
+          process.kill(proc.pid, 'SIGINT')
+        })
+        console.log('Killed "java.exe" process.')
         resolve()
       })
     } catch (err) {
