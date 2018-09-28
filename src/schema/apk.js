@@ -261,11 +261,7 @@ const listenBuildApkResult = (req, buildApkProcess, callback) => {
         const logo = `${filePath}.png`
 
         shell.mkdir('-p', `${global.appRoot}/deploy/${apkNameEN}`)
-        shell.cp(
-          '-f',
-          apkPath,
-          `${global.appRoot}/deploy/${apkNameEN}/${fileName}.apk`
-        )
+        shell.cp('-f', apkPath, `${global.appRoot}/deploy/${apkNameEN}/${fileName}.apk`)
 
         shell.cp(
           '-f',
@@ -311,23 +307,29 @@ const stopListener = async (countIntv, buildApkProcess) => {
 /**
  * Kill Java process by pid
  */
-const killJavaProcess = () => {
-  const { snapshot } = require('process-list')
-  return new Promise((resolve, reject) => {
+const killJavaProcess = () =>
+  new Promise((resolve, reject) => {
     try {
-      snapshot('pid', 'name').then(tasks => {
-        const javaProcs = tasks.filter((task) => task.name === 'java.exe')
-        javaProcs.forEach((proc) => {
-          process.kill(proc.pid, 'SIGINT')
-        })
-        console.log('Killed "java.exe" process.')
+      const { spawn } = require('child_process')
+      const KillOfProcess = spawn('cmd', ['/c', 'taskkill /im java.exe /F'], {
+        windowsHide: true,
+        timeout: 180000
+      })
+
+      KillOfProcess.stdout.on('data', data => {
+        logger.info(data.toString())
+      })
+
+      KillOfProcess.on('close', code => {
+        if (code !== 0) {
+          logger.log(`kill process exited with code ${code}`)
+        }
         resolve()
       })
     } catch (err) {
       reject(err)
     }
   })
-}
 
 /**
  * Get apk detail information from json file
