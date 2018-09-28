@@ -5,6 +5,9 @@ const shell = require('shelljs')
 const moment = require('moment')
 const logger = require('log4js').getLogger()
 const url = require('url')
+
+sharp.cache(false)
+
 /**
  * Resize user uploaded app logo
  * @param {Object} postData
