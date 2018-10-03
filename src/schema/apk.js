@@ -243,7 +243,7 @@ const build = async (req, callback) => {
 
 const listenBuildApkResult = (req, buildApkProcess, callback) => {
   const { kernel, apk_name_en: apkNameEN } = req.body
-  let timeoutSecs = 300
+  let timeoutSecs = 360
   const apkBuildDirPath = `${config.apk[kernel].rootPath}/app/build/outputs/apk/${apkNameEN}/debug`
   const apkPath = `${apkBuildDirPath}/app-${apkNameEN}-debug.apk`
 

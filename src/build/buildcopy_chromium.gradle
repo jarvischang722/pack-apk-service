@@ -65,7 +65,7 @@ android {
                     appIcon: "@mipmap/client_build_icon"
             ]
             buildConfigField "String", "AppName", '"@[appenglishname]"'
-            versionName "3.0.6"
+            versionName "3.0.7"
             buildConfigField "String", "webUrl", '"@[appurl]"'
             buildConfigField "String", "allowHost", '"@[appdomain]"'
             buildConfigField "boolean" , "isHiddenFAB", "@[hiddenactionbtn]"
