@@ -164,7 +164,7 @@ const getAPKNewName = async (apkNameEN, apkPath, kernel) => {
 
     const createDate = moment(fs.statSync(`${apkPath}`).birthtime)
       .utc()
-      .format('YYYYMMDD')
+      .format('YYYYMMDDHHmmss')
     const apkNewName = `${apkNameEN}_${createDate}_v${version}`
     return apkNewName
   } catch (err) {
@@ -241,59 +241,15 @@ const build = async (req, callback) => {
   }
 }
 
-const listenBuildApkResult = (req, buildApkProcess, callback) => {
-  const { kernel, apk_name_en: apkNameEN } = req.body
-  let timeoutSecs = 600
-  const apkBuildDirPath = `${config.apk[kernel].rootPath}/app/build/outputs/apk/${apkNameEN}/debug`
-  const apkPath = `${apkBuildDirPath}/app-${apkNameEN}-debug.apk`
-
-  const countIntv = setInterval(async () => {
-    try {
-      if (timeoutSecs === 0) {
-        stopListener(countIntv, buildApkProcess)
-        if (kernel === 'webview') callback('The builder is timeout. Please retry later.')
-      } else if (
-        timeoutSecs > 0 &&
-        fs.readdirSync(apkBuildDirPath).length > 1 &&
-        fs.existsSync(apkPath) &&
-        fs.statSync(apkPath).size > 0
-      ) {
-        const fileName = await getAPKNewName(apkNameEN, apkPath, kernel)
-        const filePath = `${req.protocol}://${req.headers.host}/download/${apkNameEN}/${fileName}`
-        const apkUrl = `${filePath}.apk`
-        const logo = `${filePath}.png`
-
-        shell.mkdir('-p', `${global.appRoot}/deploy/${apkNameEN}`)
-        shell.cp('-f', apkPath, `${global.appRoot}/deploy/${apkNameEN}/${fileName}.apk`)
-
-        shell.cp(
-          '-f',
-          `${global.appRoot}/upload/logo/${apkNameEN}.png`,
-          `${global.appRoot}/deploy/${apkNameEN}/${fileName}.png`
-        )
-        const apkData = Object.assign({}, req.body, { fileName, apkUrl, kernel, logo })
-        updApkInfoToJsonFile(apkData)
-
-        stopListener(countIntv, buildApkProcess)
-
-        logger.info(`===== APK[${apkNameEN}] is successfully established. =====`)
-
-        if (kernel === 'webview') callback(null, apkUrl)
-      }
-
-      timeoutSecs--
-    } catch (err) {
-      logger.error(`===== APK[${apkNameEN}] built failed. =====`)
-      logger.error(err)
-      stopListener(countIntv, buildApkProcess)
-
-      if (kernel === 'webview') callback(err)
-    }
-  }, 1000)
-
-  if (kernel === 'chromium') {
-    callback(null, '')
-  }
+const moveFile = async (fileName, apkNameEN, apkPath) => {
+  shell.mkdir('-p', `${global.appRoot}/deploy/${apkNameEN}`)
+  shell.rm('-f', `${global.appRoot}/deploy/${apkNameEN}/${fileName}.apk`)
+  shell.cp('-f', apkPath, `${global.appRoot}/deploy/${apkNameEN}/${fileName}.apk`)
+  shell.cp(
+    '-f',
+    `${global.appRoot}/upload/logo/${apkNameEN}.png`,
+    `${global.appRoot}/deploy/${apkNameEN}/${fileName}.png`
+  )
 }
 
 const stopListener = async (countIntv, buildApkProcess) => {
@@ -333,6 +289,54 @@ const killJavaProcess = () =>
       reject(err)
     }
   })
+
+const listenBuildApkResult = (req, buildApkProcess, callback) => {
+  const { kernel, apk_name_en: apkNameEN } = req.body
+  let timeoutSecs = 600
+  const apkBuildDirPath = `${config.apk[kernel].rootPath}/app/build/outputs/apk/${apkNameEN}/debug`
+  const apkPath = `${apkBuildDirPath}/app-${apkNameEN}-debug.apk`
+
+  const countIntv = setInterval(async () => {
+    try {
+      if (timeoutSecs === 0) {
+        stopListener(countIntv, buildApkProcess)
+        if (kernel === 'webview') callback('The builder is timeout. Please retry later.')
+      } else if (
+        timeoutSecs > 0 &&
+        fs.readdirSync(apkBuildDirPath).length > 1 &&
+        fs.existsSync(apkPath) &&
+        fs.statSync(apkPath).size > 0
+      ) {
+        const fileName = await getAPKNewName(apkNameEN, apkPath, kernel)
+        const filePath = `${req.protocol}://${req.headers.host}/download/${apkNameEN}/${fileName}`
+        const apkUrl = `${filePath}.apk`
+        const logo = `${filePath}.png`
+
+        moveFile(fileName, apkNameEN, apkPath)
+
+        updApkInfoToJsonFile(Object.assign({}, req.body, { fileName, apkUrl, kernel, logo }))
+
+        stopListener(countIntv, buildApkProcess)
+
+        logger.info(`===== APK[${apkNameEN}] is successfully established. =====`)
+
+        if (kernel === 'webview') callback(null, apkUrl)
+      }
+
+      timeoutSecs--
+    } catch (err) {
+      logger.error(`===== APK[${apkNameEN}] built failed. =====`)
+      logger.error(err)
+      stopListener(countIntv, buildApkProcess)
+
+      if (kernel === 'webview') callback(err)
+    }
+  }, 1000)
+
+  if (kernel === 'chromium') {
+    callback(null, '')
+  }
+}
 
 /**
  * Get apk detail information from json file
