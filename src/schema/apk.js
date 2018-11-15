@@ -159,18 +159,11 @@ const convGradleToJson = async path =>
  * [app name]-[create date YYYYMMDD]-[version without '.']
  * @param {String} apkNameEN
  * @param {String} apkPath
- * @param {String} kernel
+ * @param {String} version_name
  */
-const getAPKNewName = async (apkNameEN, apkPath, kernel) => {
+const getAPKNewName = async (apkNameEN, apkPath, version_name) => {
   try {
-    const gradleObj = await convGradleToJson(
-      `${global.appRoot}/src/build/buildcopy_${kernel}.gradle`
-    )
-    const version = gradleObj.android.productFlavors['@[appenglishname]'].versionName.replace(
-      /\.|\"/g,
-      ''
-    )
-
+    const version = version_name.replace(/\.|\"/g, '')
     const createDate = moment(fs.statSync(`${apkPath}`).birthtime)
       .utc()
       .format('YYYYMMDDHHmmss')
@@ -300,7 +293,7 @@ const killJavaProcess = () =>
   })
 
 const listenBuildApkResult = (req, buildApkProcess, callback) => {
-  const { kernel, apk_name_en: apkNameEN } = req.body
+  const { kernel, apk_name_en: apkNameEN, version_name } = req.body
   let timeoutSecs = 600
   const apkBuildDirPath = `${config.apk[kernel].rootPath}/app/build/outputs/apk/${apkNameEN}/debug`
   const apkPath = `${apkBuildDirPath}/app-${apkNameEN}-debug.apk`
@@ -316,7 +309,7 @@ const listenBuildApkResult = (req, buildApkProcess, callback) => {
         fs.existsSync(apkPath) &&
         fs.statSync(apkPath).size > 0
       ) {
-        const fileName = await getAPKNewName(apkNameEN, apkPath, kernel)
+        const fileName = await getAPKNewName(apkNameEN, apkPath, version_name)
         const filePath = `${req.protocol}://${req.headers.host}/download/${apkNameEN}/${fileName}`
         const apkUrl = `${filePath}.apk`
         const logo = `${filePath}.png`

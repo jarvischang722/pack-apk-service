@@ -105,8 +105,9 @@ module.exports = (route, config, exempt) => {
 * @apiParam {String} apk_name_en APK english name
 * @apiParam {File} logo APK's logo
 * @apiParam {String} apk_url URL
-* @apiParam {Boolean} [hidden_action_btn=false]  Whether to  hidden Floating Action Button
+* @apiParam {Boolean} [hidden_action_btn=false]  Whether to hidden Floating Action Button
 * @apiParam {Boolean} [auto_connect_vpn=false] Whether to enable auto connect vpn
+* @apiParam {String} version_name  APK version name
 *
 * @apiSuccess {Boolean} success
 * @apiSuccess {String} message
@@ -177,11 +178,15 @@ module.exports = (route, config, exempt) => {
 {
     "success": true,
     "apkInfo": {
-        "name": "xxxx",
-        "name_en": "xxxx",
-        "url": "https://www.xxxx.com/",
+        "name": "tripleoneTest",
+        "name_en": "tripleoneTest",
+        "url": "http://www.tripleone.com",
+        "version": "v307",
+        "fileName": "tripleoneTest_20181003_v307",
         "hidden_action_btn": true,
-        "auto_connect_vpn": false
+        "auto_connect_vpn": true,
+        "logo": "http://35.201.204.2:7101/download/tripleoneTest/tripleoneTest_20181003_v307.png",
+        "kernel": "chromium"
     }
 }
 */

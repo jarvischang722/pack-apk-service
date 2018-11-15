@@ -26,8 +26,9 @@ Tripleonetech package service
 | apk_name_en			| String	| Required|  <p>APK english name</p>							|
 | logo			| File	| Required|  <p>APK's logo</p>							|
 | apk_url			| String	| Required|  <p>URL</p>							|
-| hidden_action_btn			| Boolean	| Optional|  <p>Whether to  hidden Floating Action Button</p>							|
+| hidden_action_btn			| Boolean	| Optional|  <p>Whether to hidden Floating Action Button</p>							|
 | auto_connect_vpn			| Boolean	| Optional|  <p>Whether to enable auto connect vpn</p>							|
+| version_name			| String	| Required|  <p>APK version name</p>							|
 
 
 ### Success 200
@@ -80,11 +81,15 @@ HTTP Status: 200
 {
     "success": true,
     "apkInfo": {
-        "name": "xxxx",
-        "name_en": "xxxx",
-        "url": "https://www.xxxx.com/",
+        "name": "tripleoneTest",
+        "name_en": "tripleoneTest",
+        "url": "http://www.tripleone.com",
+        "version": "v307",
+        "fileName": "tripleoneTest_20181003_v307",
         "hidden_action_btn": true,
-        "auto_connect_vpn": false
+        "auto_connect_vpn": true,
+        "logo": "http://35.201.204.2:7101/download/tripleoneTest/tripleoneTest_20181003_v307.png",
+        "kernel": "chromium"
     }
 }
 ```
