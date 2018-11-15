@@ -36,7 +36,7 @@ android {
             ]
             minSdkVersion 21
             buildConfigField "String", "AppName", '"@[appenglishname]"'
-            versionName "3.0.7"
+            versionName "@[versionName]"
             buildConfigField "String", "webUrl", '"@[appurl]"'
             buildConfigField "String", "allowHost", '"@[appdomain]"'
             buildConfigField "boolean" , "isHiddenFAB", "@[hiddenactionbtn]"

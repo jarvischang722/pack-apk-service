@@ -64,12 +64,20 @@ const resizeLogo = async postData => {
 }
 
 /**
- * Replace these words [appenglishname, appchinesename, appurl, appdomain]  with  user input
+ * Replace these words [appenglishname, appchinesename, appurl, appdomain, versionName]  by  user input
  * @param {Object} postData
  */
 const reloadGradleFile = async postData => {
   try {
-    const { apk_name_en, apk_name, apk_url, hidden_action_btn, auto_connect_vpn, kernel } = postData
+    const {
+      apk_name_en,
+      apk_name,
+      apk_url,
+      hidden_action_btn,
+      auto_connect_vpn,
+      kernel,
+      version_name
+    } = postData
 
     let gradleFileCont = fs.readFileSync(
       `${global.appRoot}/src/build/buildcopy_${kernel}.gradle`,
@@ -90,6 +98,7 @@ const reloadGradleFile = async postData => {
     gradleFileCont = gradleFileCont.replace(/\@\[appdomain\]/g, appDomain)
     gradleFileCont = gradleFileCont.replace(/\@\[hiddenactionbtn\]/g, hidden_action_btn || false)
     gradleFileCont = gradleFileCont.replace(/\@\[autoconnectvpn\]/g, auto_connect_vpn || false)
+    gradleFileCont = gradleFileCont.replace(/\@\[versionName\]/g, version_name)
 
     fs.writeFileSync(`${config.apk[kernel].rootPath}/app/build.gradle`, gradleFileCont, 'utf8')
 

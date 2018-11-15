@@ -1,7 +1,13 @@
 {
   "parser": "babel-eslint",
   "extends": "airbnb",
-  "globals": {},
+  "globals": {
+    "describe": true,
+    "it": true,
+    "should": true,
+    "expect": true,
+    "env": true
+  },
   "env": {
     "es6": true,
     "node": true
@@ -11,10 +17,7 @@
     "ecmascript": 6
   },
   "rules": {
-    "arrow-parens": [
-      0,
-      "as-needed"
-    ],
+    "arrow-parens": [0, "as-needed"],
     "comma-dangle": [
       "error",
       {
@@ -33,10 +36,7 @@
         "properties": "always"
       }
     ],
-    "semi": [
-      2,
-      "never"
-    ],
+    "semi": [2, "never"],
     "global-require": 0,
     "no-param-reassign": [
       "error",
@@ -52,39 +52,11 @@
       "error",
       {
         "groups": [
-          [
-            "*",
-            "/",
-            "%",
-            "**"
-          ],
-          [
-            "&",
-            "|",
-            "^",
-            "~",
-            "<<",
-            ">>",
-            ">>>"
-          ],
-          [
-            "==",
-            "!=",
-            "===",
-            "!==",
-            ">",
-            ">=",
-            "<",
-            "<="
-          ],
-          [
-            "&&",
-            "||"
-          ],
-          [
-            "in",
-            "instanceof"
-          ]
+          ["*", "/", "%", "**"],
+          ["&", "|", "^", "~", "<<", ">>", ">>>"],
+          ["==", "!=", "===", "!==", ">", ">=", "<", "<="],
+          ["&&", "||"],
+          ["in", "instanceof"]
         ],
         "allowSamePrecedence": true
       }
@@ -92,9 +64,7 @@
     "import/no-extraneous-dependencies": [
       "error",
       {
-        "devDependencies": [
-          "**/*.test.js"
-        ]
+        "devDependencies": ["**/*.test.js"]
       }
     ],
     "no-unused-vars": [

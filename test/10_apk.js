@@ -25,6 +25,7 @@ describe('APK test -', () => {
       .field('hidden_action_btn', hidden_action_btn)
       .field('auto_connect_vpn', auto_connect_vpn)
       .field('kernel', kernel)
+      .expect(200)
       .attach('logo', 'test/files/logo_url.png')
       .end((err, res) => {
         // Check if the result is successful
@@ -77,6 +78,7 @@ describe('APK test -', () => {
       .set('Accept', 'application/json')
       .field('apk_name', apk_name)
       .attach('logo', 'test/files/logo_url.png')
+      .expect(400)
       .end((err, res) => {
         expect(err).to.not.exist
         expect(res.body).have.property('success')
@@ -90,6 +92,7 @@ describe('APK test -', () => {
       .post('/apk/getBuildedList')
       .set('Content-Type', 'application/json')
       .set('Accept', 'application/json')
+      .expect(200)
       .end((err, res) => {
         expect(err).to.not.exist
         expect(res.body).have.property('data')
@@ -121,6 +124,7 @@ describe('APK test -', () => {
       .set('Content-Type', 'application/json')
       .set('Accept', 'application/json')
       .send({ apkFileName })
+      .expect(200)
       .end((err, res) => {
         expect(err).to.not.exist
         expect(res.body).have.property('success')
@@ -135,6 +139,7 @@ describe('APK test -', () => {
       .post('/apk/getApkInfo')
       .set('Content-Type', 'application/json')
       .set('Accept', 'application/json')
+      .expect(400)
       .end((err, res) => {
         expect(err).to.not.exist
         expect(res.body).have.property('success')

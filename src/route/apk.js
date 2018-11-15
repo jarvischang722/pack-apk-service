@@ -16,6 +16,7 @@ const SCHEMA = {
   apkFileName: T.string().required(),
   hidden_action_btn: T.boolean(),
   auto_connect_vpn: T.boolean(),
+  version_name: T.string().required().empty('').trim(),
   kernel: T.string()
 }
 
@@ -48,6 +49,7 @@ module.exports = (route, config, exempt) => {
           'apk_url',
           'hidden_action_btn',
           'auto_connect_vpn',
+          'version_name',
           'kernel'
         )
       )
