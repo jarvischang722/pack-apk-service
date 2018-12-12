@@ -68,8 +68,14 @@ android {
             versionName "@[versionName]"
             buildConfigField "String", "webUrl", '"@[appurl]"'
             buildConfigField "String", "allowHost", '"@[appdomain]"'
-            buildConfigField "boolean" , "isHiddenFAB", "@[hiddenactionbtn]"
-            buildConfigField "boolean" , "isTurnOnVpn", "@[autoconnectvpn]"
+            buildConfigField "boolean" , "isHiddenFAB", "@[hiddenActionBtn]"
+            buildConfigField "boolean" , "isTurnOnVpn", "@[autoConnectVpn]"
+            buildConfigField "boolean" , "isHiddenTabHome", "@[hiddenTabHome]"
+            buildConfigField "boolean" , "isHiddenTabReload", "@[hiddenTabReload]"
+            buildConfigField "boolean" , "isHiddenTabPrepage", "@[hiddenTabPrepage]"
+            buildConfigField "boolean" , "isHiddenTabVpn", "@[hiddenTabVpn]"
+            buildConfigField "boolean" , "isHiddenTabUpdate", "@[hiddenTabUpdate]"
+            buildConfigField "boolean" , "isHiddenTabAbout", "@[hiddenTabAbout]"
         }
 
     }

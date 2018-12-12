@@ -51,7 +51,7 @@ const resizeLogo = async postData => {
     )
 
     Promise.all(resizeArr)
-      .then(res => {
+      .then(() => {
         // logger.info(res)
       })
       .catch(err => {
@@ -64,7 +64,8 @@ const resizeLogo = async postData => {
 }
 
 /**
- * Replace these words [appenglishname, appchinesename, appurl, appdomain, versionName]  by  user input
+ * Replace these words
+ * [appenglishname, appchinesename, appurl, appdomain, versionName]  by  user input
  * @param {Object} postData
  */
 const reloadGradleFile = async postData => {
@@ -75,6 +76,12 @@ const reloadGradleFile = async postData => {
       apk_url,
       hidden_action_btn,
       auto_connect_vpn,
+      hidden_tab_home,
+      hidden_tab_reload,
+      hidden_tab_vpn,
+      hidden_tab_update,
+      hidden_tab_about,
+      hidden_tab_prepage,
       kernel,
       version_name
     } = postData
@@ -96,8 +103,17 @@ const reloadGradleFile = async postData => {
     gradleFileCont = gradleFileCont.replace(/\@\[appchinesename\]/g, apk_name)
     gradleFileCont = gradleFileCont.replace(/\@\[appurl\]/g, apk_url)
     gradleFileCont = gradleFileCont.replace(/\@\[appdomain\]/g, appDomain)
-    gradleFileCont = gradleFileCont.replace(/\@\[hiddenactionbtn\]/g, hidden_action_btn || false)
-    gradleFileCont = gradleFileCont.replace(/\@\[autoconnectvpn\]/g, auto_connect_vpn || false)
+    gradleFileCont = gradleFileCont.replace(/\@\[hiddenActionBtn\]/g, hidden_action_btn || false)
+    gradleFileCont = gradleFileCont.replace(/\@\[autoConnectVpn\]/g, auto_connect_vpn || false)
+    gradleFileCont = gradleFileCont.replace(/\@\[isHiddenTabHome\]/g, hidden_tab_home || false)
+    gradleFileCont = gradleFileCont.replace(/\@\[isHiddenTabReload\]/g, hidden_tab_reload || false)
+    gradleFileCont = gradleFileCont.replace(
+      /\@\[isHiddenTabPrepage\]/g,
+      hidden_tab_prepage || false
+    )
+    gradleFileCont = gradleFileCont.replace(/\@\[isHiddenTabVpn\]/g, hidden_tab_vpn || false)
+    gradleFileCont = gradleFileCont.replace(/\@\[isHiddenTabUpdate\]/g, hidden_tab_update || false)
+    gradleFileCont = gradleFileCont.replace(/\@\[isHiddenTabAbout\]/g, hidden_tab_about || false)
     gradleFileCont = gradleFileCont.replace(/\@\[versionName\]/g, version_name)
 
     fs.writeFileSync(`${config.apk[kernel].rootPath}/app/build.gradle`, gradleFileCont, 'utf8')
@@ -156,10 +172,10 @@ const convGradleToJson = async path =>
 
 /**
  * APk name  change a new name that follows the pattern
- * [app name]-[create date YYYYMMDD]-[version without '.']
  * @param {String} apkNameEN
  * @param {String} apkPath
  * @param {String} version_name
+ * @returns {String} formate : [app name]-[create date YYYYMMDD]-[version without '.']
  */
 const getAPKNewName = async (apkNameEN, apkPath, version_name) => {
   try {
@@ -190,6 +206,12 @@ const updApkInfoToJsonFile = postData => {
       fileName,
       hidden_action_btn: postData.hidden_action_btn || false,
       auto_connect_vpn: postData.auto_connect_vpn || false,
+      hidden_tab_home: postData.hidden_tab_home || false,
+      hidden_tab_reload: postData.hidden_tab_reload || false,
+      hidden_tab_vpn: postData.hidden_tab_vpn || false,
+      hidden_tab_update: postData.hidden_tab_update || false,
+      hidden_tab_about: postData.hidden_tab_about || false,
+      hidden_tab_prepage: postData.hidden_tab_prepage || false,
       logo,
       kernel
     }
@@ -217,32 +239,11 @@ const updApkInfoToJsonFile = postData => {
 }
 
 /**
- *  Start Building APK
+ * Move completed apk and apk's image to deplo's dir
+ * @param {String} fileName
+ * @param {String} apkNameEN apk's English name
+ * @param {String} apkPath apk's file path
  */
-const build = async (req, callback) => {
-  const postData = req.body
-  const { kernel, apk_name_en: apkNameEN } = postData
-
-  try {
-    global.isAPKBuilding = true
-    const apkBuildDirPath = `${
-      config.apk[kernel].rootPath
-    }/app/build/outputs/apk/${apkNameEN}/debug`
-
-    shell.rm('-rf', `${config.apk[kernel].rootPath}/app/build/outputs/apk/*`)
-    shell.mkdir('-p', `${apkBuildDirPath}`)
-
-    await resizeLogo(postData)
-    await reloadGradleFile(postData)
-
-    const buildApkProcess = await runBatch(postData)
-    listenBuildApkResult(req, buildApkProcess, callback)
-  } catch (err) {
-    global.isAPKBuilding = false
-    callback(err, '')
-  }
-}
-
 const moveFile = async (fileName, apkNameEN, apkPath) => {
   shell.mkdir('-p', `${global.appRoot}/deploy/${apkNameEN}`)
   shell.rm('-f', `${global.appRoot}/deploy/${apkNameEN}/${fileName}.apk`)
@@ -252,17 +253,6 @@ const moveFile = async (fileName, apkNameEN, apkPath) => {
     `${global.appRoot}/upload/logo/${apkNameEN}.png`,
     `${global.appRoot}/deploy/${apkNameEN}/${fileName}.png`
   )
-}
-
-const stopListener = async (countIntv, buildApkProcess) => {
-  try {
-    global.isAPKBuilding = false
-    clearInterval(countIntv)
-    buildApkProcess.kill()
-    await killJavaProcess()
-  } catch (err) {
-    throw err
-  }
 }
 
 /**
@@ -292,7 +282,29 @@ const killJavaProcess = () =>
     }
   })
 
-const listenBuildApkResult = (req, buildApkProcess, callback) => {
+  /**
+   * Stop all listeners
+   * @param {Object} countIntv
+   * @param {Object} buildApkProcess
+   */
+const stopListener = async (countIntv, buildApkProcess) => {
+  try {
+    global.isAPKBuilding = false
+    clearInterval(countIntv)
+    buildApkProcess.kill()
+    await killJavaProcess()
+  } catch (err) {
+    throw err
+  }
+}
+
+/**
+ * Listening that whether build apk is completed
+ * @param {Object} req
+ * @param {Object} buildApkProcess
+ * @param {*} callback
+ */
+const listenBuildApk = (req, buildApkProcess, callback) => {
   const { kernel, apk_name_en: apkNameEN, version_name } = req.body
   let timeoutSecs = 600
   const apkBuildDirPath = `${config.apk[kernel].rootPath}/app/build/outputs/apk/${apkNameEN}/debug`
@@ -339,6 +351,34 @@ const listenBuildApkResult = (req, buildApkProcess, callback) => {
     callback(null, '')
   }
 }
+
+/**
+ *  Start Building APK
+ */
+const build = async (req, callback) => {
+  const postData = req.body
+  const { kernel, apk_name_en: apkNameEN } = postData
+
+  try {
+    global.isAPKBuilding = true
+    const apkBuildDirPath = `${
+      config.apk[kernel].rootPath
+    }/app/build/outputs/apk/${apkNameEN}/debug`
+
+    shell.rm('-rf', `${config.apk[kernel].rootPath}/app/build/outputs/apk/*`)
+    shell.mkdir('-p', `${apkBuildDirPath}`)
+
+    await resizeLogo(postData)
+    await reloadGradleFile(postData)
+
+    const buildApkProcess = await runBatch(postData)
+    listenBuildApk(req, buildApkProcess, callback)
+  } catch (err) {
+    global.isAPKBuilding = false
+    callback(err, '')
+  }
+}
+
 
 /**
  * Get apk detail information from json file
