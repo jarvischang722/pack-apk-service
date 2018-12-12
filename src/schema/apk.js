@@ -105,15 +105,15 @@ const reloadGradleFile = async postData => {
     gradleFileCont = gradleFileCont.replace(/\@\[appdomain\]/g, appDomain)
     gradleFileCont = gradleFileCont.replace(/\@\[hiddenActionBtn\]/g, hidden_action_btn || false)
     gradleFileCont = gradleFileCont.replace(/\@\[autoConnectVpn\]/g, auto_connect_vpn || false)
-    gradleFileCont = gradleFileCont.replace(/\@\[isHiddenTabHome\]/g, hidden_tab_home || false)
-    gradleFileCont = gradleFileCont.replace(/\@\[isHiddenTabReload\]/g, hidden_tab_reload || false)
+    gradleFileCont = gradleFileCont.replace(/\@\[hiddenTabHome\]/g, hidden_tab_home || false)
+    gradleFileCont = gradleFileCont.replace(/\@\[hiddenTabReload\]/g, hidden_tab_reload || false)
     gradleFileCont = gradleFileCont.replace(
-      /\@\[isHiddenTabPrepage\]/g,
+      /\@\[hiddenTabPrepage\]/g,
       hidden_tab_prepage || false
     )
-    gradleFileCont = gradleFileCont.replace(/\@\[isHiddenTabVpn\]/g, hidden_tab_vpn || false)
-    gradleFileCont = gradleFileCont.replace(/\@\[isHiddenTabUpdate\]/g, hidden_tab_update || false)
-    gradleFileCont = gradleFileCont.replace(/\@\[isHiddenTabAbout\]/g, hidden_tab_about || false)
+    gradleFileCont = gradleFileCont.replace(/\@\[hiddenTabVpn\]/g, hidden_tab_vpn || false)
+    gradleFileCont = gradleFileCont.replace(/\@\[hiddenTabUpdate\]/g, hidden_tab_update || false)
+    gradleFileCont = gradleFileCont.replace(/\@\[hiddenTabAbout\]/g, hidden_tab_about || false)
     gradleFileCont = gradleFileCont.replace(/\@\[versionName\]/g, version_name)
 
     fs.writeFileSync(`${config.apk[kernel].rootPath}/app/build.gradle`, gradleFileCont, 'utf8')
