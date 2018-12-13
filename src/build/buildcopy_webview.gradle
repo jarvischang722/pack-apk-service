@@ -41,12 +41,12 @@ android {
             buildConfigField "String", "allowHost", '"@[appdomain]"'
             buildConfigField "boolean" , "isHiddenFAB", "@[isHiddenFAB]"
             buildConfigField "boolean" , "isTurnOnVpn", "@[isTurnOnVpn]"
-            buildConfigField "boolean" , "isHiddenTabHome", "@[hiddenTabHome]"
-            buildConfigField "boolean" , "isHiddenTabReload", "@[hiddenTabReload]"
-            buildConfigField "boolean" , "isHiddenTabPrepage", "@[hiddenTabPrepage]"
-            buildConfigField "boolean" , "isHiddenTabVpn", "@[hiddenTabVpn]"
-            buildConfigField "boolean" , "isHiddenTabUpdate", "@[hiddenTabUpdate]"
-            buildConfigField "boolean" , "isHiddenTabAbout", "@[hiddenTabAbout]"
+            buildConfigField "boolean" , "isHiddenTabHome", "@[isHiddenTabHome]"
+            buildConfigField "boolean" , "isHiddenTabReload", "@[isHiddenTabReload]"
+            buildConfigField "boolean" , "isHiddenTabPrepage", "@[isHiddenTabPrepage]"
+            buildConfigField "boolean" , "isHiddenTabVpn", "@[isHiddenTabVpn]"
+            buildConfigField "boolean" , "isHiddenTabUpdate", "@[isHiddenTabUpdate]"
+            buildConfigField "boolean" , "isHiddenTabAbout", "@[isHiddenTabAbout]"
         }
 
 
