@@ -16,12 +16,12 @@ const SCHEMA = {
   apkFileName: T.string().required(),
   hidden_action_btn: T.boolean(),
   auto_connect_vpn: T.boolean(),
-  hidden_tab_home: T.boolean(),
-  hidden_tab_reload: T.boolean(),
-  hidden_tab_vpn: T.boolean(),
-  hidden_tab_update: T.boolean(),
-  hidden_tab_about: T.boolean(),
-  hidden_tab_prepage: T.boolean(),
+  isHiddenTabHome: T.boolean(),
+  isHiddenTabReload: T.boolean(),
+  isHiddenTabVpn: T.boolean(),
+  isHiddenTabUpdate: T.boolean(),
+  isHiddenTabAbout: T.boolean(),
+  isHiddenTabPrepage: T.boolean(),
   version_name: T.string().required().empty('').trim(),
   kernel: T.string()
 }
@@ -51,12 +51,12 @@ module.exports = (route, config, exempt) => {
           'apk_url',
           'hidden_action_btn',
           'auto_connect_vpn',
-          'hidden_tab_home',
-          'hidden_tab_reload',
-          'hidden_tab_vpn',
-          'hidden_tab_update',
-          'hidden_tab_about',
-          'hidden_tab_prepage',
+          'isHiddenTabHome',
+          'isHiddenTabReload',
+          'isHiddenTabVpn',
+          'isHiddenTabUpdate',
+          'isHiddenTabAbout',
+          'isHiddenTabPrepage',
           'version_name',
           'kernel'
         )
@@ -121,12 +121,12 @@ module.exports = (route, config, exempt) => {
 * @apiParam {String} apk_url URL
 * @apiParam {Boolean} [hidden_action_btn=false]  Whether to hidden Floating Action Button
 * @apiParam {Boolean} [auto_connect_vpn=false] Whether to enable auto connect vpn
-* @apiParam {Boolean} [hidden_tab_home=false]
-* @apiParam {Boolean} [hidden_tab_reload=false]
-* @apiParam {Boolean} [hidden_tab_prepage=false]
-* @apiParam {Boolean} [hidden_tab_vpn=false]
-* @apiParam {Boolean} [hidden_tab_update=false]
-* @apiParam {Boolean} [hidden_tab_about=false]
+* @apiParam {Boolean} [isHiddenTabHome=false]
+* @apiParam {Boolean} [isHiddenTabReload=false]
+* @apiParam {Boolean} [isHiddenTabPrepage=false]
+* @apiParam {Boolean} [isHiddenTabVpn=false]
+* @apiParam {Boolean} [isHiddenTabUpdate=false]
+* @apiParam {Boolean} [isHiddenTabAbout=false]
 * @apiParam {String} version_name  APK version name
 *
 * @apiSuccess {Boolean} success
@@ -205,12 +205,12 @@ module.exports = (route, config, exempt) => {
         "fileName": "tripleoneTest_20181003_v307",
         "hidden_action_btn": true,
         "auto_connect_vpn": true,
-        "hidden_tab_home": true,
-        "hidden_tab_reload": true,
-        "hidden_tab_prpage": true,
-        "hidden_tab_vpn": true,
-        "hidden_tab_update": true,
-        "hidden_tab_about": true,
+        "isHiddenTabHome": true,
+        "isHiddenTabReload": true,
+        "isHiddenTabPrpage": true,
+        "isHiddenTabVpn": true,
+        "isHiddenTabUpdate": true,
+        "isHiddenTabAbout": true,
         "logo": "http://35.201.204.2:7101/download/tripleoneTest/tripleoneTest_20181003_v307.png",
         "kernel": "chromium"
     }

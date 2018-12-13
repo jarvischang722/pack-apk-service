@@ -76,12 +76,12 @@ const reloadGradleFile = async postData => {
       apk_url,
       hidden_action_btn,
       auto_connect_vpn,
-      hidden_tab_home,
-      hidden_tab_reload,
-      hidden_tab_vpn,
-      hidden_tab_update,
-      hidden_tab_about,
-      hidden_tab_prepage,
+      isHiddenTabHome,
+      isHiddenTabReload,
+      isHiddenTabVpn,
+      isHiddenTabUpdate,
+      isHiddenTabAbout,
+      isHiddenTabPrepage,
       kernel,
       version_name
     } = postData
@@ -98,22 +98,21 @@ const reloadGradleFile = async postData => {
     if (urlParseRes.hostname.split('.').length < 3) {
       appDomain = urlParseRes.hostname.split('.')[0]
     }
-
     gradleFileCont = gradleFileCont.replace(/\@\[appenglishname\]/g, apk_name_en)
     gradleFileCont = gradleFileCont.replace(/\@\[appchinesename\]/g, apk_name)
     gradleFileCont = gradleFileCont.replace(/\@\[appurl\]/g, apk_url)
     gradleFileCont = gradleFileCont.replace(/\@\[appdomain\]/g, appDomain)
-    gradleFileCont = gradleFileCont.replace(/\@\[hiddenActionBtn\]/g, hidden_action_btn || false)
-    gradleFileCont = gradleFileCont.replace(/\@\[autoConnectVpn\]/g, auto_connect_vpn || false)
-    gradleFileCont = gradleFileCont.replace(/\@\[hiddenTabHome\]/g, hidden_tab_home || false)
-    gradleFileCont = gradleFileCont.replace(/\@\[hiddenTabReload\]/g, hidden_tab_reload || false)
+    gradleFileCont = gradleFileCont.replace(/\@\[isHiddenFAB\]/g, hidden_action_btn || false)
+    gradleFileCont = gradleFileCont.replace(/\@\[isTurnOnVpn\]/g, auto_connect_vpn || false)
+    gradleFileCont = gradleFileCont.replace(/\@\[isHiddenTabHome\]/g, isHiddenTabHome || false)
+    gradleFileCont = gradleFileCont.replace(/\@\[isHiddenTabReload\]/g, isHiddenTabReload || false)
     gradleFileCont = gradleFileCont.replace(
-      /\@\[hiddenTabPrepage\]/g,
-      hidden_tab_prepage || false
+      /\@\[isHiddenTabPrepage\]/g,
+      isHiddenTabPrepage || false
     )
-    gradleFileCont = gradleFileCont.replace(/\@\[hiddenTabVpn\]/g, hidden_tab_vpn || false)
-    gradleFileCont = gradleFileCont.replace(/\@\[hiddenTabUpdate\]/g, hidden_tab_update || false)
-    gradleFileCont = gradleFileCont.replace(/\@\[hiddenTabAbout\]/g, hidden_tab_about || false)
+    gradleFileCont = gradleFileCont.replace(/\@\[isHiddenTabVpn\]/g, isHiddenTabVpn || false)
+    gradleFileCont = gradleFileCont.replace(/\@\[isHiddenTabUpdate\]/g, isHiddenTabUpdate || false)
+    gradleFileCont = gradleFileCont.replace(/\@\[isHiddenTabAbout\]/g, isHiddenTabAbout || false)
     gradleFileCont = gradleFileCont.replace(/\@\[versionName\]/g, version_name)
 
     fs.writeFileSync(`${config.apk[kernel].rootPath}/app/build.gradle`, gradleFileCont, 'utf8')
@@ -211,12 +210,12 @@ const updApkInfoToJsonFile = postData => {
       fileName,
       hidden_action_btn: postData.hidden_action_btn || false,
       auto_connect_vpn: postData.auto_connect_vpn || false,
-      hidden_tab_home: postData.hidden_tab_home || false,
-      hidden_tab_reload: postData.hidden_tab_reload || false,
-      hidden_tab_vpn: postData.hidden_tab_vpn || false,
-      hidden_tab_update: postData.hidden_tab_update || false,
-      hidden_tab_about: postData.hidden_tab_about || false,
-      hidden_tab_prepage: postData.hidden_tab_prepage || false,
+      isHiddenTabHome: postData.isHiddenTabHome || false,
+      isHiddenTabReload: postData.isHiddenTabReload || false,
+      isHiddenTabVpn: postData.isHiddenTabVpn || false,
+      isHiddenTabUpdate: postData.isHiddenTabUpdate || false,
+      isHiddenTabAbout: postData.isHiddenTabAbout || false,
+      isHiddenTabPrepage: postData.isHiddenTabPrepage || false,
       logo,
       kernel
     }
