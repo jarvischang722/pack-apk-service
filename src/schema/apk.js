@@ -431,4 +431,24 @@ const getBuildedList = req => {
   return buildedAPKList
 }
 
-module.exports = { build, getApkInfo, getBuildedList }
+/**
+ *  Check build time whether exceeds 30 mins.
+ *  Generally  if exceeds 30 mins that this time process of build have failed.
+ *  @param {String} kn  kernel of build. (Default webview)
+ */
+const checkBuildTimeIsOver = (kn) => {
+  const kernel = kn || 'webview'
+  let isOverTime = false
+  const apkDir = `${config.apk[kernel].rootPath}/app/build/outputs/apk`
+  const dirs = fs.readdirSync(apkDir)
+  if (dirs.length > 0) {
+    const apkDirStat = fs.statSync(`${apkDir}/${dirs[0]}`)
+    const spentMins = moment(new Date()).diff(apkDirStat.ctime, 'minute')
+    if (spentMins >= 30) {
+      isOverTime = true
+    }
+  }
+  return isOverTime
+}
+
+module.exports = { build, getApkInfo, getBuildedList, checkBuildTimeIsOver }

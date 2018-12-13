@@ -36,16 +36,12 @@ const ERRORS = {
 errors.register(ERRORS)
 
 module.exports = (route, config, exempt) => {
-  const build = (req, res, next) => {
+  const build = (req, res) => {
     // It take 2 minutes to build the APK. In order to  allow  user's request to timeout more time,
     // so it must set the timeout to 3 mins (defualt 2 mins )
     req.setTimeout(180000)
     res.setTimeout(180000)
     try {
-      if (global.isAPKBuilding !== undefined && global.isAPKBuilding) {
-        return res.json({ success: false, message: 'There are others in the build, please wait' })
-      }
-
       validate(
         req.body,
         getSchema(
@@ -67,6 +63,12 @@ module.exports = (route, config, exempt) => {
       )
       req.body.kernel = req.body.kernel || 'webview'
 
+      const isBuildOverTime = APK.checkBuildTimeIsOver(req.body.kernel)
+
+      if (!isBuildOverTime && global.isAPKBuilding) {
+        return res.json({ success: false, message: 'There are others in the build, please wait' })
+      }
+
       APK.build(req, (error, apkUrl) => {
         const message = error ? error.message : null
         res.json({ success: error === null, message, apkUrl })
@@ -77,7 +79,7 @@ module.exports = (route, config, exempt) => {
     }
   }
 
-  const getBuildedList = (req, res, next) => {
+  const getBuildedList = (req, res) => {
     try {
       const buildedAPKList = APK.getBuildedList(req)
       res.json({ data: buildedAPKList })
@@ -87,7 +89,7 @@ module.exports = (route, config, exempt) => {
     }
   }
 
-  const getApkInfo = (req, res, next) => {
+  const getApkInfo = (req, res) => {
     try {
       validate(req.body, getSchema(SCHEMA, 'apkFileName'))
       const apkInfo = APK.getApkInfo(req)
