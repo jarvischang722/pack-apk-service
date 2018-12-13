@@ -142,12 +142,17 @@ const runBatch = async postData =>
           }
         )
         buildApkProcess.stdout.on('data', data => {
-          logger.info(data.toString())
+          const result = data.toString()
+          logger.info(result)
+          if (new RegExp(/FAILED/g).test(result)) {
+            global.isAPKBuilding = false
+            reject(new Error('An error occurred during the build process.'))
+          }
         })
 
         resolve(buildApkProcess)
       } else {
-        reject(new Error('Support  "Windows" only.'))
+        reject(new Error('Support Windows only.'))
       }
     } catch (err) {
       reject(err)
