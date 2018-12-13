@@ -140,15 +140,6 @@ const runBatch = async postData =>
             timeout: 180000
           }
         )
-        buildApkProcess.stdout.on('data', data => {
-          const result = data.toString()
-          logger.info(result)
-          if (new RegExp(/FAILED/g).test(result)) {
-            global.isAPKBuilding = false
-            reject(new Error('An error occurred during the build process.'))
-          }
-        })
-
         resolve(buildApkProcess)
       } else {
         reject(new Error('Support Windows only.'))
@@ -313,7 +304,6 @@ const listenBuildApk = (req, buildApkProcess, callback) => {
   let timeoutSecs = 600
   const apkBuildDirPath = `${config.apk[kernel].rootPath}/app/build/outputs/apk/${apkNameEN}/debug`
   const apkPath = `${apkBuildDirPath}/app-${apkNameEN}-debug.apk`
-
   const countIntv = setInterval(async () => {
     try {
       if (timeoutSecs === 0) {
@@ -350,6 +340,15 @@ const listenBuildApk = (req, buildApkProcess, callback) => {
       if (kernel === 'webview') callback(err)
     }
   }, 1000)
+
+  buildApkProcess.stdout.on('data', data => {
+    const result = data.toString()
+    logger.info(result)
+    if (new RegExp(/FAILED/g).test(result)) {
+      stopListener(countIntv, buildApkProcess)
+      return callback(new Error('An error occurred during the build process.'))
+    }
+  })
 
   if (kernel === 'chromium') {
     callback(null, '')
