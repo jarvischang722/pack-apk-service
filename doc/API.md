@@ -28,6 +28,12 @@ Tripleonetech package service
 | apk_url			| String	| Required|  <p>URL</p>							|
 | hidden_action_btn			| Boolean	| Optional|  <p>Whether to hidden Floating Action Button</p>							|
 | auto_connect_vpn			| Boolean	| Optional|  <p>Whether to enable auto connect vpn</p>							|
+| isHiddenTabHome			| Boolean	| Optional|  							|
+| isHiddenTabReload			| Boolean	| Optional|  							|
+| isHiddenTabPrepage			| Boolean	| Optional|  							|
+| isHiddenTabVpn			| Boolean	| Optional|  							|
+| isHiddenTabUpdate			| Boolean	| Optional|  							|
+| isHiddenTabAbout			| Boolean	| Optional|  							|
 | version_name			| String	| Required|  <p>APK version name</p>							|
 
 
@@ -88,6 +94,12 @@ HTTP Status: 200
         "fileName": "tripleoneTest_20181003_v307",
         "hidden_action_btn": true,
         "auto_connect_vpn": true,
+        "isHiddenTabHome": true,
+        "isHiddenTabReload": true,
+        "isHiddenTabPrpage": true,
+        "isHiddenTabVpn": true,
+        "isHiddenTabUpdate": true,
+        "isHiddenTabAbout": true,
         "logo": "http://35.201.204.2:7101/download/tripleoneTest/tripleoneTest_20181003_v307.png",
         "kernel": "chromium"
     }
