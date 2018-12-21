@@ -189,7 +189,7 @@ const getAPKNewName = async (apkNameEN, apkPath, version_name) => {
  * update apk Info
  * @param {Object} postData
  */
-const updApkInfoToJsonFile = postData => {
+const updApkInfo = postData => {
   try {
     const { fileName, apk_name, apk_name_en, apk_url, logo, kernel } = postData
     let allAPKInfo = {}
@@ -308,7 +308,7 @@ const listenBuildApk = (req, buildApkProcess, callback) => {
     try {
       if (timeoutSecs === 0) {
         stopListener(countIntv, buildApkProcess)
-        if (kernel === 'webview') callback('The builder is timeout. Please retry later.')
+        if (kernel === 'webview') return callback('The builder is timeout. Please retry later.')
       } else if (
         timeoutSecs > 0 &&
         fs.readdirSync(apkBuildDirPath).length > 1 &&
@@ -322,13 +322,13 @@ const listenBuildApk = (req, buildApkProcess, callback) => {
 
         moveFile(fileName, apkNameEN, apkPath)
 
-        updApkInfoToJsonFile(Object.assign({}, req.body, { fileName, apkUrl, kernel, logo }))
+        updApkInfo(Object.assign({}, req.body, { fileName, apkUrl, kernel, logo }))
 
         stopListener(countIntv, buildApkProcess)
 
         logger.info(`===== APK[${apkNameEN}] is successfully established. =====`)
 
-        if (kernel === 'webview') callback(null, apkUrl)
+        if (kernel === 'webview') return callback(null, apkUrl)
       }
 
       timeoutSecs--
@@ -337,7 +337,7 @@ const listenBuildApk = (req, buildApkProcess, callback) => {
       logger.error(err)
       stopListener(countIntv, buildApkProcess)
 
-      if (kernel === 'webview') callback(err)
+      if (kernel === 'webview') return callback(err)
     }
   }, 1000)
 
@@ -351,7 +351,7 @@ const listenBuildApk = (req, buildApkProcess, callback) => {
   })
 
   if (kernel === 'chromium') {
-    callback(null, '')
+    return callback(null, '')
   }
 }
 
@@ -378,7 +378,7 @@ const build = async (req, callback) => {
     listenBuildApk(req, buildApkProcess, callback)
   } catch (err) {
     global.isAPKBuilding = false
-    callback(err, '')
+    return callback(err, '')
   }
 }
 
@@ -414,7 +414,7 @@ const getBuildedList = req => {
         )
         for (const apkname of Object.keys(apkList)) {
           const apk = apkList[apkname]
-          const name_en = apk.name_en
+          const name_en = apk.name_en.toUpperCase()
           const fileName = apkname
           const kernel = apk.kernel || ''
           const logo = apk.logo || ''
@@ -436,7 +436,7 @@ const getBuildedList = req => {
 
 /**
  *  Check build time whether exceeds 30 mins.
- *  Generally  if exceeds 30 mins that this time process of build have failed.
+ *  Generally if exceeds 30 mins that is the process of build have failed.
  *  @param {String} kn  kernel of build. (Default webview)
  */
 const checkBuildTimeIsOver = (kn) => {
