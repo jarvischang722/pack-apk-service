@@ -1,6 +1,15 @@
 ## Build APK service
 
-####  ✔ `POST` `/apk/build` - APK builder
+### Goal
+Generate apk via api in online tool.
+
+### API
+
+* [Build APK](#Build-APK)
+* [Get APK information](#Get-APK-information)
+* [Get a list of completed APKs](#Get-a-list-of-completed-APKs)
+
+####  ✔ `POST` `/apk/build` - Build APK
 
 + Parameters:
 
@@ -41,7 +50,6 @@ Success-Response: **HTTP Status: 200**
   "apkUrl": 'https://www.xxx.yyy/build/xxxx.apk'
 }
 ```
-
 
 ----
 
@@ -95,10 +103,9 @@ endif
 > 1. Platform是'Chromium'不需要等待build完就回傳，因為Chromium版本的通常build的時間過長，可能會使這一個request都timeout了，所以需要先回傳，
 > 2. 如果Platform是'webview'版本，建立時間大概落在5~10分內，所以設定10分鐘後才會顯示建立失敗的訊息
 
-
 ----
 
-####  ✔ `POST` `/apk/getBuildedList ` -  Get APK download url
+####  ✔ `POST` `/apk/getBuildedList ` -  Get a list of completed APKs
 
 + Parameters:
 
