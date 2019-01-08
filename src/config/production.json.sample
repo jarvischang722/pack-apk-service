@@ -1,7 +1,8 @@
 {
   "name": "Tripleonetech APK service",
   "server": {
-    "port": 7101
+    "port": 7101,
+    "domain": "appbuilder.tripleonetech.net"
   },
   "jwtOptions": {
     "expiresIn": "180d"
