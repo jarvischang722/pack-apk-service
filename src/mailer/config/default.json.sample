@@ -1,0 +1,9 @@
+{
+  "host": "mail.tripleonetech.net",
+  "port": "25",
+  "secure": true,
+  "auth": {
+    "user": "appdeveloper@tripleonetech.net",
+    "pass": "Pass1234"
+  }
+}

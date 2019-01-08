@@ -25,3 +25,5 @@ src/config/*.json
 package-lock.json
 
 /doc/apidoc/output
+
+src/mailer/config/default.json

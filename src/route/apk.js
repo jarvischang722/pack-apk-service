@@ -23,7 +23,9 @@ const SCHEMA = {
   isHiddenTabAbout: T.boolean(),
   isHiddenTabPrepage: T.boolean(),
   version_name: T.string().required().empty('').trim(),
-  kernel: T.string()
+  kernel: T.string().allow('chromium', 'Chromium', 'webview', 'Webview'),
+  isClient: T.boolean(),
+  email: T.string().email()
 }
 
 const ERRORS = {
@@ -58,10 +60,11 @@ module.exports = (route, config, exempt) => {
           'isHiddenTabAbout',
           'isHiddenTabPrepage',
           'version_name',
-          'kernel'
+          'kernel',
+          'isClient',
+          'email'
         )
       )
-      req.body.kernel = req.body.kernel || 'webview'
 
       const isBuildOverTime = APK.checkBuildTimeIsOver(req.body.kernel)
 

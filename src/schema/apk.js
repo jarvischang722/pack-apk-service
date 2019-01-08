@@ -5,6 +5,7 @@ const shell = require('shelljs')
 const moment = require('moment')
 const logger = require('log4js').getLogger()
 const url = require('url')
+const mailer = require('../mailer')
 
 sharp.cache(false)
 
@@ -150,22 +151,6 @@ const runBatch = async postData =>
   })
 
 /**
- * convert .gradle file to json
- */
-const convGradleToJson = async path =>
-  new Promise((resolve, reject) => {
-    try {
-      require('gradle-to-js/lib/parser')
-        .parseFile(path)
-        .then(gradleObj => {
-          resolve(gradleObj)
-        })
-    } catch (err) {
-      reject(err)
-    }
-  })
-
-/**
  * APk name  change a new name that follows the pattern
  * @param {String} apkNameEN
  * @param {String} apkPath
@@ -234,20 +219,31 @@ const updApkInfo = postData => {
 }
 
 /**
- * Move completed apk and apk's image to deplo's dir
+ * Move completed apk and apk's image to deploy dir.
+ * If isClient is true, then just copy apk to '/deploy/fromClient/'
  * @param {String} fileName
- * @param {String} apkNameEN apk's English name
- * @param {String} apkPath apk's file path
+ * @param {String} apkNameEN APK's English name
+ * @param {String} apkPath Completed APK file path
+ * @param {String} isClient Whether to build the apk from client page
  */
-const moveFile = async (fileName, apkNameEN, apkPath) => {
-  shell.mkdir('-p', `${global.appRoot}/deploy/${apkNameEN}`)
-  shell.rm('-f', `${global.appRoot}/deploy/${apkNameEN}/${fileName}.apk`)
-  shell.cp('-f', apkPath, `${global.appRoot}/deploy/${apkNameEN}/${fileName}.apk`)
-  shell.cp(
-    '-f',
-    `${global.appRoot}/upload/logo/${apkNameEN}.png`,
-    `${global.appRoot}/deploy/${apkNameEN}/${fileName}.png`
-  )
+const moveFile = async (fileName, apkNameEN, apkSrcPath, isClient) => {
+  const deployDir = `${global.appRoot}/deploy/${apkNameEN}`
+  const clientDir = `${global.appRoot}/deploy/fromClient/`
+  const apkTargetPath = isClient === true ? `${clientDir}/${fileName}.apk` : `${deployDir}/${fileName}.apk`
+  if (isClient === true) {
+    shell.mkdir('-p', clientDir)
+  } else {
+    shell.mkdir('-p', deployDir)
+    shell.cp(
+      '-f',
+      `${global.appRoot}/upload/logo/${apkNameEN}.png`,
+      `${deployDir}/${fileName}.png`
+    )
+  }
+  shell.rm('-f', apkTargetPath)
+  shell.cp('-f', apkSrcPath, apkTargetPath)
+
+  // TODO Delete those expired files in clientDir.(About 3 days)
 }
 
 /**
@@ -293,6 +289,28 @@ const stopListener = async (countIntv, buildApkProcess) => {
   }
 }
 
+const sendToClient = async (downloadUrl, email) => {
+  const title = 'Your App from Tripleonetech Builder'
+  const content = `Congratulations. your app was done.<br>
+  File only keep three days.<br>
+  below is your app link. hope you like it.<br>
+  Download URL : ${downloadUrl} 
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  ========= <br>
+  Tripleone Tech Pte. Ltd. Taiwan Branch<br>
+  新加坡商合眾科技顧問有限公司台灣分公司<br>
+  www.tripleonetech.net
+  `
+  const recipients = email
+
+  mailer.send(title, content, recipients)
+}
+
 /**
  * Listening that whether build apk is completed
  * @param {Object} req
@@ -300,7 +318,7 @@ const stopListener = async (countIntv, buildApkProcess) => {
  * @param {*} callback
  */
 const listenBuildApk = (req, buildApkProcess, callback) => {
-  const { kernel, apk_name_en: apkNameEN, version_name } = req.body
+  const { kernel, apk_name_en: apkNameEN, version_name, isClient, email } = req.body
   let timeoutSecs = 600
   const apkBuildDirPath = `${config.apk[kernel].rootPath}/app/build/outputs/apk/${apkNameEN}/debug`
   const apkPath = `${apkBuildDirPath}/app-${apkNameEN}-debug.apk`
@@ -320,11 +338,21 @@ const listenBuildApk = (req, buildApkProcess, callback) => {
         const apkUrl = `${filePath}.apk`
         const logo = `${filePath}.png`
 
-        moveFile(fileName, apkNameEN, apkPath)
+        moveFile(fileName, apkNameEN, apkPath, isClient)
 
-        updApkInfo(Object.assign({}, req.body, { fileName, apkUrl, kernel, logo }))
+        // 如果build APK是由client page生成，則只需要將結果寄送EMail就好
+        if (isClient === true) {
+          sendToClient(apkUrl, email)
+        } else {
+          updApkInfo(Object.assign({}, req.body, { fileName, apkUrl, kernel, logo }))
+        }
+
 
         stopListener(countIntv, buildApkProcess)
+
+        if (isClient === true) {
+          sendToClient(apkUrl, email)
+        }
 
         logger.info(`===== APK[${apkNameEN}] is successfully established. =====`)
 
