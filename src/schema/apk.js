@@ -334,7 +334,9 @@ const listenBuildApk = (req, buildApkProcess, callback) => {
         fs.statSync(apkPath).size > 0
       ) {
         const fileName = await getAPKNewName(apkNameEN, apkPath, version_name)
-        const filePath = `${req.protocol}://${req.headers.host}/download/${apkNameEN}/${fileName}`
+        const filePath = isClient === true
+                      ? `${req.protocol}://${req.headers.host}/download/fromClient/${fileName}`
+                      : `${req.protocol}://${req.headers.host}/download/${apkNameEN}/${fileName}`
         const apkUrl = `${filePath}.apk`
         const logo = `${filePath}.png`
 
