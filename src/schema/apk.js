@@ -350,12 +350,7 @@ const listenBuildApk = (req, buildApkProcess, callback) => {
           updApkInfo(Object.assign({}, req.body, { fileName, apkUrl, kernel, logo }))
         }
 
-
         stopListener(countIntv, buildApkProcess)
-
-        if (isClient === true) {
-          sendToClient(apkUrl, email)
-        }
 
         logger.info(`===== APK[${apkNameEN}] is successfully established. =====`)
 
