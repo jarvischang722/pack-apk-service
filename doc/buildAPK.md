@@ -74,7 +74,7 @@ else(no)
 |Back End|
     :Create Listener;
     if(platform not equal to 'chromium') then (yes)
-        while (Build finished?)  is (No)
+        while (Build finished?)  is (no)
           :Check the build time that has been spent;
           note right
             If over 10 mins , then response error to caller.
@@ -86,7 +86,7 @@ else(no)
              the representative setup process has been completed.
           end note
 
-        endwhile (no)
+        endwhile (yes)
 
         :Move apk to specific path;
     :Update apk json;
